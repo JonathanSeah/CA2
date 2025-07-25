@@ -4,6 +4,7 @@
 // Import required modules
 const express = require('express');
 const mysql = require('mysql2');
+const session = require('express-session'); // set up session management
 const multer = require('multer');  // set up multer for file uploads
 // Create an Express application
 const app = express();
@@ -11,7 +12,7 @@ const app = express();
 //set up multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'UsersPic/images'); // Directory to save uploaded files
+        cb(null, 'Pic/images'); // Directory to save uploaded files
     },
     filename: (req, file, cb) => {
         cb(null,file.originalname); // Use the original file name
@@ -42,11 +43,20 @@ connection.connect((err) => {
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 
-app.use('/UsersPic',express.static('UsersPic/images')); // Serve static files from the 'public' directory
+app.use('/Pic',express.static('Pic/images')); // Serve static files from the 'public' directory
 
 // Middleware to parse request bodies
 app.use(express.urlencoded({ extended: false }));
- 
+app.use(express.static('public')); // Serve static files from the 'public' directory
+
+// Middleware for session management
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 & 7 } // Set to true if using HTTPS
+}));
+
 app.get('/', (req, res) => {
     const queries = {
         user: 'SELECT * FROM user',
@@ -81,21 +91,21 @@ app.get('/', (req, res) => {
 
 app.get('/user/:id', (req, res) => {
     //Extract student ID from the request parameters
-    const name = req.params.id;
-    const sql = 'SELECT* FROM user WHERE name = ?';
+    const userID = req.params.id;
+    const sql = 'SELECT* FROM user WHERE userID = ?';
     // Fetch data from MySQL based on the name
-    connection.query(sql, [name], (error, results) => {
+    connection.query(sql, [userID], (error, results) => {
         if (error) {
             console.error('Database query error:', error.message);
             return res.status(500).send('Error Retrieving name by ID');
         }
         if (results.length > 0) {
         // Render the student details page with the fetched data
-        res.render('name', { name: results[0] });
+        res.render('userID', { user: results[0] });
         }
         else {
             // If no name with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('name not found');
+            res.status(404).send('userID not found');
         }
     });
 });
@@ -148,16 +158,16 @@ app.get('/addUser', (req, res) => {
 
 app.post('/addUser', upload.single('image'),(req, res) => {
     // extract  data from the request body
-    const {name, phone_number, email_address,nric,age,gender} = req.body;
+    const {username, password, phone_number, email_address,nric,age,gender} = req.body;
     let userPic;
     if (req.file) {
         userPic = req.file.filename; // Get the uploaded file name
     } else {
         userPic = 'null'; 
     }
-    const sql = 'INSERT INTO user (name, phone_number, email_address, nric, age, gender, userPic) VALUES (?, ?, ?, ?,?, ?, ?)';
+    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender, userPic) VALUES (?, ?, ?, ?,?, ?, ?, ?)';
     // Insert the new user into the database
-    connection.query(sql, [name, phone_number, email_address, nric, age, gender, userPic ], (error, results) => {
+    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender, userPic ], (error, results) => {
         if (error) {
             console.error('Error adding user:', error);
             res.status(500).send('Error adding user');
@@ -273,15 +283,15 @@ app.get('/updateFood/:id', (req, res) => {
 app.post('/updateUser/:id', upload.single('image'),(req, res) => {
     const userID = req.params.id;
     // Extract updated product data from the request body
-    const { name, phone_number, email_address, nric , age, gender } = req.body;
+    const { username, password, phone_number, email_address, nric , age, gender } = req.body;
     let image = req.body.currentImage; // retrieve current image filename
     if (req.file) {
         image = req.file.filename; // Get the uploaded file name if a new file is uploaded
     }
-    const sql = 'UPDATE user SET name = ?, phone_number = ?, email_address = ?, nric = ?, age = ?, gender = ?, image =? WHERE userID = ?';
+    const sql = 'UPDATE user SET username = ?, password = ? , phone_number = ?, email_address = ?, nric = ?, age = ?, gender = ?, image =? WHERE userID = ?';
 
     // Insert the new product into the database
-    connection.query(sql, [name, phone_number, email_address, nric, age, gender, image, userID ], (error, results ) => {
+    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender, image, userID ], (error, results ) => {
         if (error) {
             // Handle any errors that occur during the database operation
             console.error('Error updating user:', error);
