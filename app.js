@@ -24,6 +24,7 @@ const upload = multer({ storage: storage });
 //Created mysql connection
 const connection = mysql.createConnection({
     host: 'c237-e65p.mysql.database.azure.com',
+    port: 3306,
     user: 'c237user',
     password: 'c2372025!',
     database: 'c237_24009380'
