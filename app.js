@@ -23,10 +23,10 @@ const upload = multer({ storage: storage });
 
 //Created mysql connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Republic_C207',
-    database: 'c237_ca2_fitness_tracker'
+    host: 'c237-e65p.mysql.database.azure.com',
+    user: 'c237user',
+    password: 'c2372025!',
+    database: 'c237_24009380'
   });
  
 // Connect to the MySQL database
@@ -193,7 +193,13 @@ app.get('/addFood', (req, res) => {
 app.post('/addFood', upload.single('image'),(req, res) => {
     // extract  data from the request body
     const {food_name, carbs, protein, calories, fats} = req.body;
-    
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Get the uploaded file name
+    } else {
+        image = 'null'; 
+    }
+
     const sql = 'INSERT INTO food_tracker (food_name,carbs, protein, calories, fats, Pic_food) VALUES (?, ?, ?, ?,?, ?)';
     // Insert the new food into the database
     connection.query(sql, [food_name, carbs, protein, calories, fats, Pic_food ], (error, results) => {
@@ -206,56 +212,165 @@ app.post('/addFood', upload.single('image'),(req, res) => {
     });
 });
 
-app.get('/updateStudent/:id', (req, res) => {
-    const studentId = req.params.id;
-    const sql = 'SELECT * FROM student WHERE studentId = ?';
-    // Fetch data from MYSQL based on the student ID
-    connection.query(sql, [studentId], (error, results) => {
+app.get('/updateUser/:id', (req, res) => {
+    const userID = req.params.id;
+    const sql = 'SELECT * FROM user WHERE userID = ?';
+    // Fetch data from MYSQL based on the name
+    connection.query(sql, [userID], (error, results) => {
         if (error) {
             console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving student by ID');
+            return res.status(500).send('Error Retrieving name by ID');
         }
         if (results.length > 0) {
-            // Render the edit student page with the fetched data
-            res.render('updateStudent', { student: results[0] });
+            // Render the edit user page with the fetched data
+            res.render('updateUser', { user: results[0] });
         } else {
-            // If no student with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('Student not found');
+            // If no user with the given ID was found, render a 404 page or handle it accordingly
+            res.status(404).send('UserID not found');
         }
     });
 });
 
-app.post('/updateStudent/:id', upload.single('image'),(req, res) => {
-    const studentId = req.params.id;
+app.get('/updateExercise/:id', (req, res) => {
+    const exerciseID = req.params.id;
+    const sql = 'SELECT * FROM exercise_tracker WHERE exerciseID = ?';
+    // Fetch data from MYSQL based on the name
+    connection.query(sql, [exerciseID], (error, results) => {
+        if (error) {
+            console.error('Database query error:', error.message);
+            return res.status(500).send('Error Retrieving exercise by ID');
+        }
+        if (results.length > 0) {
+            // Render the edit exercise_tracker page with the fetched data
+            res.render('updateExercise', { exercise_tracker: results[0] });
+        } else {
+            // If no Exercise_name with the given ID was found, render a 404 page or handle it accordingly
+            res.status(404).send('ExerciseID not found');
+        }
+    });
+});
+
+app.get('/updateFood/:id', (req, res) => {
+    const foodID = req.params.id;
+    const sql = 'SELECT * FROM food_tracker WHERE foodID = ?';
+    // Fetch data from MYSQL based on the name
+    connection.query(sql, [foodID], (error, results) => {
+        if (error) {
+            console.error('Database query error:', error.message);
+            return res.status(500).send('Error Retrieving food_name by ID');
+        }
+        if (results.length > 0) {
+            // Render the edit exercise_tracker page with the fetched data
+            res.render('updateFood', { food_tracker: results[0] });
+        } else {
+            // If no food_name with the given ID was found, render a 404 page or handle it accordingly
+            res.status(404).send('FoodID not found');
+        }
+    });
+});
+
+app.post('/updateUser/:id', upload.single('image'),(req, res) => {
+    const userID = req.params.id;
     // Extract updated product data from the request body
-    const { name, dob, contact } = req.body;
+    const { name, phone_number, email_address, nric , age, gender } = req.body;
     let image = req.body.currentImage; // retrieve current image filename
     if (req.file) {
         image = req.file.filename; // Get the uploaded file name if a new file is uploaded
     }
-    const sql = 'UPDATE student SET name = ?, dob = ?, contact = ?,image =? WHERE studentId = ?';
+    const sql = 'UPDATE user SET name = ?, phone_number = ?, email_address = ?, nric = ?, age = ?, gender = ?, image =? WHERE userID = ?';
 
     // Insert the new product into the database
-    connection.query(sql, [name, dob, contact, image, studentId], (error, results ) => {
+    connection.query(sql, [name, phone_number, email_address, nric, age, gender, image, userID ], (error, results ) => {
         if (error) {
             // Handle any errors that occur during the database operation
-            console.error('Error updating student:', error);
-            res.status(500).send('Error updating student');
+            console.error('Error updating user:', error);
+            res.status(500).send('Error updating user');
         } else {
             res.redirect('/');
         }
     });
 });
 
-app.get('/deleteStudent/:id', (req, res) => {
-    const studentId = req.params.id;
-    const sql = 'DELETE FROM student WHERE studentId = ?';
+app.post('/updateExercise/:id', (req, res) => {
+    const exerciseID = req.params.id;
+    // Extract updated product data from the request body
+    const { exercise_name, types, reps, sets } = req.body;
+
+    const sql = 'UPDATE exercise_tracker SET exercise_name = ?, types = ?, reps = ?, sets = ? WHERE exerciseID = ?';
+
+    // Insert the new product into the database
+    connection.query(sql, [exercise_name, types, reps, sets, exerciseID ], (error, results ) => {
+        if (error) {
+            // Handle any errors that occur during the database operation
+            console.error('Error updating exercise_tracker:', error);
+            res.status(500).send('Error updating exercise_tracker');
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.post('/updateFood/:id',upload.single('image'), (req, res) => {
+    const foodID = req.params.id;
+    // Extract updated product data from the request body
+    const { food_name, carbs, protein, calories, fats} = req.body;
+    let image = req.body.currentImage; // retrieve current image filename
+    if (req.file) {
+        image = req.file.filename; // Get the uploaded file name if a new file is uploaded
+    }
+    const sql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats =?, image WHERE foodID = ?';
+
+    // Insert the new product into the database
+    connection.query(sql, [food_name, carbs, protein, calories, fats, foodID ], (error, results ) => {
+        if (error) {
+            // Handle any errors that occur during the database operation
+            console.error('Error updating food_tracker:', error);
+            res.status(500).send('Error updating food_tracker');
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.get('/deleteUser/:id', (req, res) => {
+    const userID = req.params.id;
+    const sql = 'DELETE FROM user WHERE userID = ?';
     
     // Delete the product from the database
-    connection.query(sql, [studentId], (error, results) => {
+    connection.query(sql, [userID], (error, results) => {
         if (error) {
-            console.error('Error deleting student:', error);
-            res.status(500).send('Error deleting student');
+            console.error('Error deleting user:', error);
+            res.status(500).send('Error deleting user');
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.get('/deleteExercise/:id', (req, res) => {
+    const exerciseID = req.params.id;
+    const sql = 'DELETE FROM exercise_tracker WHERE exerciseID = ?';
+    
+    // Delete the product from the database
+    connection.query(sql, [exerciseID], (error, results) => {
+        if (error) {
+            console.error('Error deleting exercise:', error);
+            res.status(500).send('Error deleting exercise');
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.get('/deleteFood/:id', (req, res) => {
+    const foodID = req.params.id;
+    const sql = 'DELETE FROM food_tracker WHERE foodID = ?';
+    
+    // Delete the product from the database
+    connection.query(sql, [foodID], (error, results) => {
+        if (error) {
+            console.error('Error deleting food:', error);
+            res.status(500).send('Error deleting food');
         } else {
             res.redirect('/');
         }
