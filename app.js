@@ -6,17 +6,20 @@ const express = require('express');
 const mysql = require('mysql2');
 const session = require('express-session'); // set up session management
 const multer = require('multer');  // set up multer for file uploads
+const flash = require('connect-flash');
+const path = require('path');
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
+
 // Create an Express application
 const app = express();
 
 //set up multer for file uploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'Pic/images'); // Directory to save uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null,file.originalname); // Use the original file name
-    }
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, `${Date.now()}${path.extname(file.originalname)}`)
 });
 
 const upload = multer({ storage: storage });
@@ -30,7 +33,7 @@ const connection = mysql.createConnection({
     password: 'c2372025!',
     database: 'c237_24009380'
   });
- 
+const pool = connection.promise(); 
 // Connect to the MySQL database
 connection.connect((err) => {
     if (err) {
@@ -54,8 +57,9 @@ app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 & 7 } // Set to true if using HTTPS
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // Set to true if using HTTPS
 }));
+
 
 // TO DO:Create a middleware function validate user authentication
 const validateRegistration = (req, res, next) => {
@@ -87,6 +91,13 @@ app.post('/register', validateRegistration,(req, res) => {
         res.redirect('/login');
     });
 });
+
+app.use(flash());
+function isLoggedIn(req, res, next) {
+  if (req.session && req.session.user) return next();
+  return res.redirect('/login');
+}
+
 
 
 app.get('/', (req, res) => {
@@ -210,51 +221,69 @@ app.post('/addUser', upload.single('image'),(req, res) => {
     });
 });
 
-app.get('/addExercise', (req, res) => {
-    res.render('addExercise');
+//add exercise - Jonathan ------------------------------------//
+app.get('/addExercise', isLoggedIn, (req, res) => {
+  res.render('AddExercise', { message: req.flash('error') });
 });
 
-app.post('/addExercise',(req, res) => {
-    // extract  data from the request body
-    const {exercise_name, types, reps, sets} = req.body;
-    
-    const sql = 'INSERT INTO exercise_tracker (exercise_name, types, reps, sets) VALUES (?, ?, ?, ?)';
-    // Insert the new exercise into the database
-    connection.query(sql, [exercise_name, types, reps, sets ], (error, results) => {
-        if (error) {
-            console.error('Error adding Exercise:', error);
-            res.status(500).send('Error adding Exercise');
-        } else {
-            res.redirect('/');
-        }
-    });
-});
+app.post(
+  '/addExercise',
+  isLoggedIn,
+  async (req, res) => {
+    const { exercise_name, types, reps, sets } = req.body;
 
-app.get('/addFood', (req, res) => {
-    res.render('addFood');
-});
-
-app.post('/addFood', upload.single('image'),(req, res) => {
-    // extract  data from the request body
-    const {food_name, carbs, protein, calories, fats} = req.body;
-    let image;
-    if (req.file) {
-        image = req.file.filename; // Get the uploaded file name
-    } else {
-        image = 'null'; 
+    if (exercise_name.length > 45 || types.length > 45) {
+      req.flash('error', 'Field length exceeded.');
+      return res.redirect('/addExercise');
     }
 
-    const sql = 'INSERT INTO food_tracker (food_name,carbs, protein, calories, fats, Pic_food) VALUES (?, ?, ?, ?,?, ?)';
-    // Insert the new food into the database
-    connection.query(sql, [food_name, carbs, protein, calories, fats, Pic_food ], (error, results) => {
-        if (error) {
-            console.error('Error adding Food:', error);
-            res.status(500).send('Error adding Food');
-        } else {
-            res.redirect('/');
-        }
-    });
+    try {
+      await pool.query(
+        `INSERT INTO exercise_tracker (userID, exercise_name, types, reps, sets)
+         VALUES (?,?,?,?,?)`,
+        [req.session.user.userID, exercise_name, types, reps, sets]
+      );
+      req.flash('info', 'Exercise added successfully.');
+      res.redirect('/dashboard');
+    } catch (err) {
+      console.error(err);
+      req.flash('error', 'Could not add exercise.');
+      res.redirect('/addExercise');
+    }
+  }
+);
+//--------------------------------------------------------------//
+
+//add food - Jonathan-------------------------------------------//
+app.get('/addFood', isLoggedIn, (req, res) => {
+  res.render('AddFood', { message: req.flash('error') });
 });
+
+app.post('/addFood', isLoggedIn, upload.single('foodImage'), async (req, res) => {
+  const { food_name, carbs, protein, calories, fats } = req.body;
+
+  if (food_name.length > 45) {
+    req.flash('error', 'Food name exceeds 45 characters.');
+    return res.redirect('/addFood');
+  }
+
+  const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+  try {
+    await pool.query(
+      `INSERT INTO food_tracker (userID, food_name, carbs, protein, calories, fats, image)
+       VALUES (?,?,?,?,?,?,?)`,
+      [req.session.user.userID, food_name, carbs, protein, calories, fats, imagePath]
+    );
+    req.flash('info', 'Food added successfully.');
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Could not add food.');
+    res.redirect('/addFood');
+  }
+});
+//---------------------------------------------------------------//
 
 app.get('/updateUser/:id', (req, res) => {
     const userID = req.params.id;
@@ -275,43 +304,13 @@ app.get('/updateUser/:id', (req, res) => {
     });
 });
 
-app.get('/updateExercise/:id', (req, res) => {
-    const exerciseID = req.params.id;
-    const sql = 'SELECT * FROM exercise_tracker WHERE exerciseID = ?';
-    // Fetch data from MYSQL based on the name
-    connection.query(sql, [exerciseID], (error, results) => {
-        if (error) {
-            console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving exercise by ID');
-        }
-        if (results.length > 0) {
-            // Render the edit exercise_tracker page with the fetched data
-            res.render('updateExercise', { exercise_tracker: results[0] });
-        } else {
-            // If no Exercise_name with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('ExerciseID not found');
-        }
-    });
-});
+// update exercise -Elden-------------------------------------//
 
-app.get('/updateFood/:id', (req, res) => {
-    const foodID = req.params.id;
-    const sql = 'SELECT * FROM food_tracker WHERE foodID = ?';
-    // Fetch data from MYSQL based on the name
-    connection.query(sql, [foodID], (error, results) => {
-        if (error) {
-            console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving food_name by ID');
-        }
-        if (results.length > 0) {
-            // Render the edit exercise_tracker page with the fetched data
-            res.render('updateFood', { food_tracker: results[0] });
-        } else {
-            // If no food_name with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('FoodID not found');
-        }
-    });
-});
+//---------------------------------------------------------------//
+
+// update food -Elden ----------------------------------------//
+
+//---------------------------------------------------------------//
 
 app.post('/updateUser/:id', upload.single('image'),(req, res) => {
     const userID = req.params.id;
@@ -329,47 +328,6 @@ app.post('/updateUser/:id', upload.single('image'),(req, res) => {
             // Handle any errors that occur during the database operation
             console.error('Error updating user:', error);
             res.status(500).send('Error updating user');
-        } else {
-            res.redirect('/');
-        }
-    });
-});
-
-app.post('/updateExercise/:id', (req, res) => {
-    const exerciseID = req.params.id;
-    // Extract updated product data from the request body
-    const { exercise_name, types, reps, sets } = req.body;
-
-    const sql = 'UPDATE exercise_tracker SET exercise_name = ?, types = ?, reps = ?, sets = ? WHERE exerciseID = ?';
-
-    // Insert the new product into the database
-    connection.query(sql, [exercise_name, types, reps, sets, exerciseID ], (error, results ) => {
-        if (error) {
-            // Handle any errors that occur during the database operation
-            console.error('Error updating exercise_tracker:', error);
-            res.status(500).send('Error updating exercise_tracker');
-        } else {
-            res.redirect('/');
-        }
-    });
-});
-
-app.post('/updateFood/:id',upload.single('image'), (req, res) => {
-    const foodID = req.params.id;
-    // Extract updated product data from the request body
-    const { food_name, carbs, protein, calories, fats} = req.body;
-    let image = req.body.currentImage; // retrieve current image filename
-    if (req.file) {
-        image = req.file.filename; // Get the uploaded file name if a new file is uploaded
-    }
-    const sql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats =?, image WHERE foodID = ?';
-
-    // Insert the new product into the database
-    connection.query(sql, [food_name, carbs, protein, calories, fats, foodID ], (error, results ) => {
-        if (error) {
-            // Handle any errors that occur during the database operation
-            console.error('Error updating food_tracker:', error);
-            res.status(500).send('Error updating food_tracker');
         } else {
             res.redirect('/');
         }
