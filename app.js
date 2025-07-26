@@ -270,111 +270,12 @@ app.get('/updateUser/:id', (req, res) => {
     });
 });
 
-// update exercise - Jonathan-------------------------------------//
-app.get('/updateExercise/:id', isLoggedIn, async (req, res) => {
-  try {
-    const userID = req.session.user.userID;
-    const [rows] = await pool.query(
-      'SELECT * FROM exercise_tracker WHERE exerciseID = ? AND userID = ?',
-      [req.params.id, userID]
-    );
-    if (!rows.length) {
-      req.flash('error', 'Exercise not found.');
-      return res.redirect('/dashboard');
-    }
-    res.render('UpdateExercise', { exercise: rows[0], message: req.flash('error') });
-  } catch (err) {
-    console.error(err);
-    req.flash('error', 'Could not load the exercise.');
-    res.redirect('/dashboard');
-  }
-});
+// update exercise -Elden-------------------------------------//
 
-app.post('/updateExercise/:id', isLoggedIn, async (req, res) => {
-  const { exercise_name, types, reps, sets } = req.body;
-
-  if ((exercise_name && exercise_name.length > 45) || (types && types.length > 45)) {
-    req.flash('error', 'Field length exceeded (max 45 chars).');
-    return res.redirect(`/updateExercise/${req.params.id}`);
-  }
-
-  try {
-    const userID = req.session.user.userID;
-    const [result] = await pool.query(
-      `UPDATE exercise_tracker
-         SET exercise_name = ?, types = ?, reps = ?, sets = ?
-       WHERE exerciseID = ? AND userID = ?`,
-      [exercise_name, types, reps, sets, req.params.id, userID]
-    );
-
-    if (!result.affectedRows) {
-      req.flash('error', 'Nothing was updated.');
-      return res.redirect('/dashboard');
-    }
-
-    req.flash('info', 'Exercise updated successfully.');
-    res.redirect('/dashboard');
-  } catch (err) {
-    console.error(err);
-    req.flash('error', 'Could not update the exercise.');
-    res.redirect(`/updateExercise/${req.params.id}`);
-  }
-});
 //---------------------------------------------------------------//
 
-// update food -Jonathan ----------------------------------------//
-app.get('/updateFood/:id', isLoggedIn, async (req, res) => {
-  try {
-    const userID = req.session.user.userID;
-    const [rows] = await pool.query(
-      'SELECT * FROM food_tracker WHERE foodID = ? AND userID = ?',
-      [req.params.id, userID]
-    );
-    if (!rows.length) {
-      req.flash('error', 'Food item not found.');
-      return res.redirect('/dashboard');
-    }
-    res.render('UpdateFood', { food: rows[0], message: req.flash('error') });
-  } catch (err) {
-    console.error(err);
-    req.flash('error', 'Could not load the food item.');
-    res.redirect('/dashboard');
-  }
-});
+// update food -Elden ----------------------------------------//
 
-app.post('/updateFood/:id', isLoggedIn, upload.single('foodImage'), async (req, res) => {
-  const { food_name, carbs, protein, calories, fats } = req.body;
-
-  if (food_name && food_name.length > 45) {
-    req.flash('error', 'Food name exceeds 45 characters.');
-    return res.redirect(`/updateFood/${req.params.id}`);
-  }
-
-  const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-
-  try {
-    const userID = req.session.user.userID;
-    const [result] = await pool.query(
-      `UPDATE food_tracker
-         SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ?,
-             image = IFNULL(?, image)
-       WHERE foodID = ? AND userID = ?`,
-      [food_name, carbs, protein, calories, fats, imagePath, req.params.id, userID]
-    );
-
-    if (!result.affectedRows) {
-      req.flash('error', 'Nothing was updated.'); // wrong ID or not your record
-      return res.redirect('/dashboard');
-    }
-
-    req.flash('info', 'Food updated successfully.');
-    res.redirect('/dashboard');
-  } catch (err) {
-    console.error(err);
-    req.flash('error', 'Could not update the food item.');
-    res.redirect(`/updateFood/${req.params.id}`);
-  }
-});
 //---------------------------------------------------------------//
 
 app.post('/updateUser/:id', upload.single('image'),(req, res) => {
