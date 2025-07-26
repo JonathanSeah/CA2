@@ -7,7 +7,6 @@ const mysql = require('mysql2');
 const session = require('express-session'); // set up session management
 const multer = require('multer');  // set up multer for file uploads
 const flash = require('connect-flash');
-app.use(flash());
 const path = require('path');
 const fs = require('fs');
 
@@ -58,8 +57,15 @@ app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 & 7 } // Set to true if using HTTPS
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // Set to true if using HTTPS
 }));
+
+app.use(flash());
+function isLoggedIn(req, res, next) {
+  if (req.session && req.session.user) return next();
+  return res.redirect('/login');
+}
+
 
 app.get('/', (req, res) => {
     const queries = {
