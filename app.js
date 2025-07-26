@@ -57,12 +57,45 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24 & 7 } // Set to true if using HTTPS
 }));
 
+// TO DO:Create a middleware function validate user authentication
+const validateRegistration = (req, res, next) => {
+    const { username, password, phone_number, email_address, nric,age, gender } = req.body;
+    if (!username || !password || !phone_number || !email_address || !nric || ! age || ! gender) {
+        return res.status(400).send('All fields are required');
+    }
+
+    if (password.length < 6) {
+        req.flash('error', 'Password must be at least 6 or more characters long');
+        req.flash('formData', req.body);
+        return res.redirect('/register');
+    }
+    next();
+};
+
+//******** TODO: Integrate validateRegistration into the register route. ********//
+app.post('/register', validateRegistration,(req, res) => {
+    //******** TODO: Update register route to include role. ********//
+    const { username, password, phone_number, email_address, nric, age, gender } = req.body;
+
+    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender) VALUES (?, SHA1(?), ?, ?, ?, ?, ?)';
+    db.query(sql, [username, password, phone_number, email_address, nric, age, gender], (err, result) => {
+        if (err) {
+            throw err;
+        }
+        console.log(result);
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
+    });
+});
+
+
 app.get('/', (req, res) => {
     const queries = {
         user: 'SELECT * FROM user',
         exercise_tracker: 'SELECT * FROM exercise_tracker',
         food_tracker: 'SELECT * FROM food_tracker'
     };
+
 
     // First query: get user data
     connection.query(queries.user, (err, users) => {
