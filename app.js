@@ -46,10 +46,20 @@ connection.connect((err) => {
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 
+//******** TODO: Create a Middleware to check if user is logged in. ********//
+const checkAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        return next();
+    } else {
+        req.flash('error', 'You must be logged in to view this resource.');
+        res.redirect('/login');
+    }
+};
+
 app.use('/Pic',express.static('Pic/images')); // Serve static files from the 'public' directory
 
 // Middleware to parse request bodies
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); // Serve static files from the 'public' directory
 
 // Middleware for session management
@@ -139,6 +149,13 @@ app.get('/logout', (req, res) => {
     res.redirect('/'); // Redirect to login page after logout
     });
 });
+
+//******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
+app.get('/dashboard', checkAuthenticated, (req, res) => {
+    res.render('dashboard', { user: req.session.user, messages: req.flash('success') });
+});
+
+
 app.use(flash());
 function isLoggedIn(req, res, next) {
   if (req.session && req.session.user) return next();
