@@ -60,6 +60,7 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // Set to true if using HTTPS
 }));
 
+app.use(flash()); // Use flash messages for notifications   
 
 // TO DO:Create a middleware function validate user authentication
 const validateRegistration = (req, res, next) => {
@@ -82,7 +83,7 @@ app.post('/register', validateRegistration,(req, res) => {
     const { username, password, phone_number, email_address, nric, age, gender } = req.body;
 
     const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender) VALUES (?, SHA1(?), ?, ?, ?, ?, ?)';
-    db.query(sql, [username, password, phone_number, email_address, nric, age, gender], (err, result) => {
+    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender], (err, result) => {
         if (err) {
             throw err;
         }
@@ -92,6 +93,52 @@ app.post('/register', validateRegistration,(req, res) => {
     });
 });
 
+app.get('/register', (req, res) => {
+    res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+});
+
+//******** TODO: Insert code for login routes to render login page below ********//
+app.get('/login', (req, res) => {
+    res.render('login', { 
+        messages: req.flash('success'), // Retrieve success messages from session and pass them to the view
+        errors: req.flash('error') // Retrieve error messages from session and pass them to the view
+    });
+});
+
+//******** TODO: Insert code for login routes for form submission below ********//
+app.post('/login', (req, res) => {
+    const { username,email_address, password } = req.body;
+
+    //Validate username ,email, password
+    if (!username|| !email_address || !password) {
+        req.flash('error', 'All fields are required.'); 
+        return res.redirect('/login');
+    }
+
+    const sql = 'SELECT * FROM user WHERE username = ? AND email_address = ? AND password = SHA1(?)';
+    connection.query(sql, [username,email_address, password], (err, results) => {
+        if (err) {
+            throw err;
+        }
+        if (results.length > 0) {
+            // Successful Login
+            req.session.user = results[0]; // Store user data in session
+            req.flash('success', 'Login successful!');
+            //************ TO DO: Update to redirect users to /dashboard route upon successful log in *//
+            res.redirect('/dashboard');
+        } else {
+            // Invaild credentials
+            req.flash('error', 'Invalid username, email or password.');
+            return res.redirect('/login');
+        }
+    });
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+    res.redirect('/'); // Redirect to login page after logout
+    });
+});
 app.use(flash());
 function isLoggedIn(req, res, next) {
   if (req.session && req.session.user) return next();
@@ -101,6 +148,7 @@ function isLoggedIn(req, res, next) {
 
 
 app.get('/', (req, res) => {
+    res.render('index', {user: req.session.user, messages: req.flash('success')});
     const queries = {
         user: 'SELECT * FROM user',
         exercise_tracker: 'SELECT * FROM exercise_tracker',
