@@ -18,7 +18,8 @@ const app = express();
 
 //set up multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => 
+    cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, `${Date.now()}${path.extname(file.originalname)}`)
 });
 
@@ -56,6 +57,16 @@ const checkAuthenticated = (req, res, next) => {
     }
 };
 
+//******** TODO: Create a Middleware to check if user is admin. ********//
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') {
+        return next();
+    } else {
+        req.flash('error', 'Access denied.');
+        res.redirect('/');
+    }
+};
+
 app.use('/Pic',express.static('Pic/images')); // Serve static files from the 'public' directory
 
 // Middleware to parse request bodies
@@ -90,10 +101,10 @@ const validateRegistration = (req, res, next) => {
 //******** TODO: Integrate validateRegistration into the register route. ********//
 app.post('/register', validateRegistration,(req, res) => {
     //******** TODO: Update register route to include role. ********//
-    const { username, password, phone_number, email_address, nric, age, gender } = req.body;
+    const { username, password, phone_number, email_address, nric, age, gender,role } = req.body;
 
-    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender) VALUES (?, SHA1(?), ?, ?, ?, ?, ?)';
-    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender], (err, result) => {
+    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender,role) VALUES (?, SHA1(?), ?, ?, ?, ?, ?,?)';
+    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender,role], (err, result) => {
         if (err) {
             throw err;
         }
@@ -135,7 +146,12 @@ app.post('/login', (req, res) => {
             req.session.user = results[0]; // Store user data in session
             req.flash('success', 'Login successful!');
             //************ TO DO: Update to redirect users to /dashboard route upon successful log in *//
-            res.redirect('/dashboard');
+            // res.redirect('/dashboard');
+            if (results[0].role === 'admin') {
+                res.redirect('/admin'); // Redirect to admin dashboard
+            } else {
+                res.redirect('/dashboard'); // Redirect to user dashboard
+            }
         } else {
             // Invaild credentials
             req.flash('error', 'Invalid username, email or password.');
@@ -144,14 +160,31 @@ app.post('/login', (req, res) => {
     });
 });
 
+
+
+//******** TODO: Insert code for admin route to render dashboard page for admin. ********//
+app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('admin', { user: req.session.user, messages: req.flash('success') });
+});
+
+app.get('/dashboard', checkAuthenticated, (req, res) => {
+    if (req.session.user.role === 'admin') {
+    res.redirect('/admin');
+  } else {
+    res.render('dashboard', { user: req.session.user, messages: req.flash('success') });
+  }
+
+});
+
 app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
+    req.session.destroy(() => {
     res.redirect('/'); // Redirect to login page after logout
     });
 });
 
 //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
 app.get('/dashboard', checkAuthenticated, (req, res) => {
+    console.log("Logged-in user:", req.session.user);  // ✅ Add this
     res.render('dashboard', { user: req.session.user, messages: req.flash('success') });
 });
 
@@ -261,30 +294,7 @@ app.get('/exercise_name/:id', (req, res) => {
     });
 });
 
-app.get('/addUser', (req, res) => {
-    res.render('addUser');
-});
 
-app.post('/addUser', upload.single('image'),(req, res) => {
-    // extract  data from the request body
-    const {username, password, phone_number, email_address,nric,age,gender} = req.body;
-    let userPic;
-    if (req.file) {
-        userPic = req.file.filename; // Get the uploaded file name
-    } else {
-        userPic = 'null'; 
-    }
-    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender, userPic) VALUES (?, ?, ?, ?,?, ?, ?, ?)';
-    // Insert the new user into the database
-    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender, userPic ], (error, results) => {
-        if (error) {
-            console.error('Error adding user:', error);
-            res.status(500).send('Error adding user');
-        } else {
-            res.redirect('/');
-        }
-    });
-});
 
 //add exercise - Jonathan ------------------------------------//
 app.get('/addExercise', isLoggedIn, (req, res) => {
