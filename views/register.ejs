@@ -17,41 +17,45 @@
         <form action="/register" method="POST" class="mt-4">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" class="form-control" required 
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter Username" required 
                 <% if (formData && formData.username) { %> value="<%= formData.username %>" <% } else { %> value="" <% } %>>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" class="form-control" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password" required>
             </div>
             <div class="form-group">
                 <label for="phone_number">Phone Number:</label>
-                <input type="text" id="phone_number" name="phone_number" class="form-control" required 
+                <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="Enter phone number" required 
                 <% if (formData && formData.phone_number) { %> value="<%= formData.phone_number %>" <% } else { %> value="" <% } %>>
             </div>
             <div class="form-group">
                 <label for="email_address"> Email Address:</label>
-                <input type="email" id="email_address" name="email_address" class="form-control" required 
+                <input type="email" id="email_address" name="email_address" class="form-control" placeholder="Enter Email Address" required 
                 <% if (formData && formData.email_address) { %> value="<%= formData.email_address %>" <% } else { %> value="" <% } %>>
             </div>
             <div class="form-group">
                 <label for="nric">NRIC:</label>
-                <input type="text" id="nric" name="nric" class="form-control" required 
+                <input type="text" id="nric" name="nric" class="form-control" placeholder="Enter NRIC" required 
                 <% if (formData && formData.nric) { %> value="<%= formData.nric %>" <% } else { %> value="" <% } %>>
             </div>
             <div class="form-group">
                 <label for="age">Age:</label>
-                <input type="number" id="age" name="age" class="form-control" required 
+                <input type="number" id="age" name="age" class="form-control" placeholder="Enter Age" required 
                 <% if (formData && formData.age) { %> value="<%= formData.age %>" <% } else { %> value="" <% } %>>
             </div>
             <div class="form-group">
                 <label for="gender">Gender: </label>
-                <input type="text" id="gender" name="gender" class="form-control" required 
-                <% if (formData && formData.gender) { %> value="<%= formData.gender %>" <% } else { %> value="" <% } %>>
-            </div>
+                <select id="gender" name="gender" class="form-control" required>
+                    <option value="" disabled <% if (!formData || !formData.gender) { %> selected <% } %> hidden>Select Gender</option>
+                    <option value="male" <% if (formData && formData.gender === 'male') { %> selected <% } %>>Male</option>
+                    <option value="female" <% if (formData && formData.gender === 'female') { %> selected <% } %>>Female</option>
+                </select>
+                
             <div class="form-group">
                 <label for="role">Role:</label>
-                <select id="role" name="role" class="form-control" required>
+                <select id="role" name="role" class="form-control" placeholder="Select Role" required>
+                    <option value="" disabled <% if (!formData || !formData.role) { %> selected <% } %> hidden>Select Role</option>
                     <option value="user" <% if (formData && formData.role === 'user') { %> selected <% } %>>User</option>
                     <option value="admin" <% if (formData && formData.role === 'admin') { %> selected <% } %>>Admin</option>
                 </select>
