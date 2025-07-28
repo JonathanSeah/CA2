@@ -198,7 +198,6 @@ function isLoggedIn(req, res, next) {
 
 
 app.get('/', (req, res) => {
-    res.render('index', {user: req.session.user, messages: req.flash('success')});
     const queries = {
         user: 'SELECT * FROM user',
         exercise_tracker: 'SELECT * FROM exercise_tracker',
@@ -222,7 +221,9 @@ app.get('/', (req, res) => {
                 res.render('index', {
                     user: users,
                     exercise_tracker: exercises,
-                    food_tracker: foods
+                    food_tracker: foods,
+                    messages: req.flash('success'),
+                    sessionUser: req.session.user
                 });
             });
         });
