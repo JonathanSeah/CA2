@@ -103,7 +103,7 @@ app.post('/register', validateRegistration,(req, res) => {
     //******** TODO: Update register route to include role. ********//
     const { username, password, phone_number, email_address, nric, age, gender,role } = req.body;
 
-    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender,role) VALUES (?, SHA1(?), ?, ?, ?, ?, ?,?)';
+    const sql = 'INSERT INTO user (username, password, phone_number, email_address, nric, age, gender, role) VALUES (?, SHA1(?), ?, ?, ?, ?, ?, ?)';
     connection.query(sql, [username, password, phone_number, email_address, nric, age, gender,role], (err, result) => {
         if (err) {
             throw err;
@@ -176,6 +176,40 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
 
 });
 
+// Profile page — load user, their foods, and exercises
+app.get('/profile', checkAuthenticated, async (req, res, next) => {
+  try {
+    // your session user row has a userID field, not “id”
+    const user    = req.session.user;
+    const userId  = user.userID;
+
+    // pull all foods for this user, newest first
+    const [foods] = await pool.query(
+      'SELECT * FROM food_tracker WHERE userID = ? ORDER BY foodID DESC',
+      [userId]
+    );
+
+    // pull all exercises for this user, newest first
+    const [exercises] = await pool.query(
+      'SELECT * FROM exercise_tracker WHERE userID = ? ORDER BY exerciseID DESC',
+      [userId]
+    );
+
+    res.render('profile', {
+      user,
+      foods,
+      exercises,
+      success: req.flash('success'),
+      error:   req.flash('error')
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
     res.redirect('/'); // Redirect to login page after logout
@@ -187,6 +221,8 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
     console.log("Logged-in user:", req.session.user);  // ✅ Add this
     res.render('dashboard', { user: req.session.user, messages: req.flash('success') });
 });
+
+
 
 
 app.use(flash());
@@ -235,7 +271,7 @@ app.get('/', (req, res) => {
 app.get('/user/:id', (req, res) => {
     //Extract student ID from the request parameters
     const userID = req.params.id;
-    const sql = 'SELECT* FROM user WHERE userID = ?';
+    const sql = 'SELECT * FROM user WHERE userID = ?'
     // Fetch data from MySQL based on the name
     connection.query(sql, [userID], (error, results) => {
         if (error) {
@@ -256,7 +292,7 @@ app.get('/user/:id', (req, res) => {
 app.get('/food_name/:id', (req, res) => {
     //Extract student ID from the request parameters
     const food_name = req.params.id;
-    const sql = 'SELECT* FROM food_tracker WHERE food_name = ?';
+    const sql = 'SELECT * FROM food_tracker WHERE food_name = ?';
     // Fetch data from MySQL based on the name
     connection.query(sql, [food_name], (error, results) => {
         if (error) {
@@ -277,7 +313,7 @@ app.get('/food_name/:id', (req, res) => {
 app.get('/exercise_name/:id', (req, res) => {
     //Extract exercise ID from the request parameters
     const exercise_name = req.params.id;
-    const sql = 'SELECT* FROM exercise_tracker WHERE exercise_name = ?';
+    const sql = 'SELECT * FROM exercise_tracker WHERE exercise_name = ?';
     // Fetch data from MySQL based on the name
     connection.query(sql, [exercise_name], (error, results) => {
         if (error) {

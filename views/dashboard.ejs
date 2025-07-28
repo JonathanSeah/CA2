@@ -8,11 +8,7 @@
     <div class="container">
         <h1 class="mt-5">Dashboard</h1>
         <p>Welcome, <%= user.username %> (<%= user.role %>), to users Dashboard</p>
-        <% if (user.role === 'admin') { %>
-            <a href="/admin" class="btn btn-primary">Admin Dashboard</a>
-        <% } else { %>
             <a href="/profile">View Profile</a>
-        <% } %>
         <a href="/logout" class="btn btn-primary">Logout</a>
     </div>
 </body>
