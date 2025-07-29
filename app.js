@@ -469,6 +469,27 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 });
 //---------------------------------------------------------------//
 
+
+//View All Items -Bao Rui
+
+// View All Foods
+app.get('/view-foods', checkAuthenticated, (req, res) => {
+  const userID = req.session.user.userID;
+  connection.query('SELECT * FROM food_tracker ', (err, results) => {
+    if (err) throw err;
+    res.render('viewFoods', { foods: results });
+  });
+});
+
+
+// View All Exercises!!
+app.get('/view-exercises', function (req, res) {
+    connection.query('SELECT * FROM exercise_tracker', function (err, results) {
+        if (err) throw err;
+        res.render('viewExercises', { exercises: results });
+    });
+});
+
 // update food -Elden ----------------------------------------//
 app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
   const foodID = req.params.id;
