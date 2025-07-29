@@ -9,6 +9,7 @@ const multer = require('multer');  // set up multer for file uploads
 const flash = require('connect-flash');
 const path = require('path');
 const fs = require('fs');
+const { types } = require('util');
 
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -408,59 +409,59 @@ app.post('/addFood', isLoggedIn, upload.single('foodImage'), async (req, res) =>
 //---------------------------------------------------------------//
 
 // update exercise -Elden-------------------------------------//
-app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
-  const foodID = req.params.id;
-  const sql = 'SELECT * FROM food_tracker WHERE foodID = ?';  // Fetch food data by ID          
-  connection.query(sql, [foodID], (error, results) => {
+app.get('/updateExercise/:id', checkAuthenticated, (req, res) => {
+  const exerciseID = req.params.id;
+  const sql = 'SELECT * FROM exercise_tracker WHERE exerciseID = ?';  // Fetch food data by ID          
+  connection.query(sql, [exerciseID], (error, results) => {
     if (error) {
-      console.error("Error fetching food:", error);
-      return res.status(500).send('Error fetching food');
+      console.error("Error fetching exercises:", error);
+      return res.status(500).send('Error fetching exercises');
     } else if (results.length === 0) {
-      return res.status(404).send('Food not found');
+      return res.status(404).send('Exercise not found');
     } else {
-      const food = results[0];
+      const exercise = results[0];
       // Only allow if user owns the food or is admin
       if (
         req.session.user.role === 'admin' ||
-        food.userID === req.session.user.userID
+        exercise.userID === req.session.user.userID
       ) {
-        res.render('updateFood', { food, messages: req.flash('error') });
+        res.render('updateExercise', { exercise, messages: req.flash('error') });
       } else {
-        req.flash('error', 'Unauthorized to update this food entry.');
+        req.flash('error', 'Unauthorized to update this exercise entry.');
         return res.redirect('/dashboard');
       }
     }
   });
 });
 
-app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
-  const foodID = req.params.id;
-  const { food_name, carbs, protein, calories, fats } = req.body;
+app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
+  const exerciseID = req.params.id;
+  const { exercise_name, types , rep, set } = req.body;
 
   // First, fetch the food entry to check ownership or admin
-  const fetchSql = 'SELECT userID FROM food_tracker WHERE foodID = ?';
-  connection.query(fetchSql, [foodID], (fetchErr, results) => {
+  const fetchSql = 'SELECT userID FROM exercise_tracker WHERE exerciseID = ?';
+  connection.query(fetchSql, [exerciseID], (fetchErr, results) => {
     if (fetchErr) {
-      console.error("Error fetching food for update:", fetchErr);
-      return res.status(500).send('Error fetching food');
+      console.error("Error fetching exercise for update:", fetchErr);
+      return res.status(500).send('Error fetching exercise');
     }
     if (results.length === 0) {
-      return res.status(404).send('Food not found');
+      return res.status(404).send('Exercise not found');
     }
-    const foodOwnerId = results[0].userID;
+    const exerciseOwnerId = results[0].userID;
     const currentUser = req.session.user;
 
     // Only allow if current user is owner or admin
-    if (currentUser.userID !== foodOwnerId && currentUser.role !== 'admin') {
-      req.flash('error', 'Unauthorized to update this food entry.');
+    if (currentUser.userID !== exerciseOwnerId && currentUser.role !== 'admin') {
+      req.flash('error', 'Unauthorized to update this exercise entry.');
       return res.redirect('/dashboard');
     }
 
-    const updateSql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ? WHERE foodID = ?';
-    connection.query(updateSql, [food_name, carbs, protein, calories, fats, foodID], (updateErr) => {
+    const updateSql = 'UPDATE exercise_tracker SET exercise_name = ?, types = ?, rep = ?, set = ? WHERE exerciseID = ?';
+    connection.query(updateSql, [exercise_name, types , rep, set, exerciseID], (updateErr) => {
       if (updateErr) {
-        console.error("Error updating food:", updateErr);
-        return res.status(500).send('Error updating food');
+        console.error("Error updating exercise:", updateErr);
+        return res.status(500).send('Error updating exercise');
       }
       res.redirect('/dashboard');
     });
