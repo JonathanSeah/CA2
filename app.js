@@ -164,7 +164,18 @@ app.post('/login', (req, res) => {
 
 //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
 app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
-    res.render('admin', { user: req.session.user, messages: req.flash('success') });
+  const sql = 'SELECT * FROM user';
+  connection.query(sql, (err, users) => {
+    if (err) {
+      console.error('DB error on /admin:', err);
+      return res.status(500).send('Database error');
+    }
+    res.render('admin', {
+      user: req.session.user,     // for your navbar
+      users,                      // feeds your Bootstrap table
+      messages: req.flash('success')
+    });
+  });
 });
 
 app.get('/dashboard', checkAuthenticated, (req, res) => {
@@ -268,25 +279,24 @@ app.get('/', (req, res) => {
 
 
 
-app.get('/user/:id', (req, res) => {
-    //Extract student ID from the request parameters
-    const userID = req.params.id;
-    const sql = 'SELECT * FROM user WHERE userID = ?'
-    // Fetch data from MySQL based on the name
-    connection.query(sql, [userID], (error, results) => {
-        if (error) {
-            console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving name by ID');
-        }
-        if (results.length > 0) {
-        // Render the student details page with the fetched data
-        res.render('userID', { user: results[0] });
-        }
-        else {
-            // If no name with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('userID not found');
-        }
+app.get('/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
+  const userID = req.params.id;
+  const sql = 'SELECT * FROM user WHERE userID = ?';
+  connection.query(sql, [userID], (err, results) => {
+    if (err) {
+      console.error('DB error on /user/:id', err);
+      return res.status(500).send('Database error');
+    }
+    if (!results.length) {
+      return res.status(404).send('User not found');
+    }
+
+    res.render('user', {
+      user: req.session.user,        // still your logged-in admin
+      selectedUser: results[0],      // the record you clicked
+      messages: req.flash('success')
     });
+  });
 });
 
 app.get('/food_name/:id', (req, res) => {
@@ -397,25 +407,6 @@ app.post('/addFood', isLoggedIn, upload.single('foodImage'), async (req, res) =>
 });
 //---------------------------------------------------------------//
 
-app.get('/updateUser/:id', (req, res) => {
-    const userID = req.params.id;
-    const sql = 'SELECT * FROM user WHERE userID = ?';
-    // Fetch data from MYSQL based on the name
-    connection.query(sql, [userID], (error, results) => {
-        if (error) {
-            console.error('Database query error:', error.message);
-            return res.status(500).send('Error Retrieving name by ID');
-        }
-        if (results.length > 0) {
-            // Render the edit user page with the fetched data
-            res.render('updateUser', { user: results[0] });
-        } else {
-            // If no user with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('UserID not found');
-        }
-    });
-});
-
 // update exercise -Elden-------------------------------------//
 
 //---------------------------------------------------------------//
@@ -424,41 +415,60 @@ app.get('/updateUser/:id', (req, res) => {
 
 //---------------------------------------------------------------//
 
-app.post('/updateUser/:id', upload.single('image'),(req, res) => {
-    const userID = req.params.id;
-    // Extract updated product data from the request body
-    const { username, password, phone_number, email_address, nric , age, gender } = req.body;
-    let image = req.body.currentImage; // retrieve current image filename
-    if (req.file) {
-        image = req.file.filename; // Get the uploaded file name if a new file is uploaded
+app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
+  const userID = req.params.id;
+  const sql = 'SELECT * FROM user WHERE userID = ?';
+  connection.query(sql, [userID], (err, results) => {
+    if (err) {
+      req.flash('error','DB error');
+      return res.redirect('/admin');
     }
-    const sql = 'UPDATE user SET username = ?, password = ? , phone_number = ?, email_address = ?, nric = ?, age = ?, gender = ?, image =? WHERE userID = ?';
-
-    // Insert the new product into the database
-    connection.query(sql, [username, password, phone_number, email_address, nric, age, gender, image, userID ], (error, results ) => {
-        if (error) {
-            // Handle any errors that occur during the database operation
-            console.error('Error updating user:', error);
-            res.status(500).send('Error updating user');
-        } else {
-            res.redirect('/');
-        }
+    if (!results.length) {
+      req.flash('error','User not found');
+      return res.redirect('/admin');
+    }
+    res.render('updateUser', {
+      user:        req.session.user,
+      selectedUser: results[0],
+      messages:    req.flash('error')
     });
+  });
 });
 
-app.get('/deleteUser/:id', (req, res) => {
-    const userID = req.params.id;
-    const sql = 'DELETE FROM user WHERE userID = ?';
-    
-    // Delete the product from the database
-    connection.query(sql, [userID], (error, results) => {
-        if (error) {
-            console.error('Error deleting user:', error);
-            res.status(500).send('Error deleting user');
-        } else {
-            res.redirect('/');
-        }
-    });
+app.post('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
+  const id = req.params.id;
+  const { username, email_address, phone_number, age, gender, role } = req.body;
+  const sql = `
+    UPDATE user
+       SET username = ?, email_address = ?, phone_number = ?, age = ?, gender = ?, role = ?
+     WHERE userID = ?
+  `;
+  connection.query(sql,
+    [username, email_address, phone_number, age, gender, role, id],
+    (err) => {
+      if (err) {
+        console.error('Update error:', err);
+        req.flash('error','Could not update user');
+        return res.redirect(`/updateUser/${id}`);
+      }
+      req.flash('success','User updated');
+      res.redirect('/admin');
+    }
+  );
+});
+
+app.post('/deleteUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
+  const id = req.params.id;
+  const sql = 'DELETE FROM user WHERE userID = ?';
+  connection.query(sql, [id], (err) => {
+    if (err) {
+      console.error('Delete error:', err);
+      req.flash('error', 'Delete failed');
+    } else {
+      req.flash('success', 'User deleted');
+    }
+    res.redirect('/admin');
+  });
 });
 
 app.get('/deleteExercise/:id', (req, res) => {

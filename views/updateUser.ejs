@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update User | Admin</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Update User</h1>
+    <a href="/admin" class="btn btn-secondary mb-3">&larr; Back to Admin</a>
+    <% if (messages && messages.length) { %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% messages.forEach(msg => { %>
+            <li><%= msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form action="/updateUser/<%= selectedUser.userID %>" method="POST">
+      <div class="form-group mb-3">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="<%= selectedUser.username %>" class="form-control" required>
+      </div>
+      <div class="form-group mb-3">
+        <label for="email_address">Email</label>
+        <input type="email" id="email_address" name="email_address" value="<%= selectedUser.email_address %>" class="form-control" required>
+      </div>
+      <div class="form-group mb-3">
+        <label for="phone_number">Phone Number</label>
+        <input type="text" id="phone_number" name="phone_number" value="<%= selectedUser.phone_number %>" class="form-control">
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-4 mb-3">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" value="<%= selectedUser.age %>" class="form-control">
+        </div>
+        <div class="form-group col-md-4 mb-3">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" class="form-control">
+            <option value="Male" <%= selectedUser.gender === 'Male' ? 'selected' : '' %>>Male</option>
+            <option value="Female" <%= selectedUser.gender === 'Female' ? 'selected' : '' %>>Female</option>
+            <option value="Other" <%= selectedUser.gender === 'Other' ? 'selected' : '' %>>Other</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4 mb-3">
+          <label for="role">Role</label>
+          <select id="role" name="role" class="form-control">
+            <option value="user" <%= selectedUser.role === 'user' ? 'selected' : '' %>>User</option>
+            <option value="admin" <%= selectedUser.role === 'admin' ? 'selected' : '' %>>Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+</body>
+</html>

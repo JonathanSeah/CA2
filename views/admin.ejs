@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -8,8 +9,41 @@
     <div class="container">
         <h1 class="mt-5">Admin Dashboard</h1>
         <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
-        <a href="/manage-users">Manage Users</a>
-        <a href="/logout" class="btn btn-primary">Logout</a>
+
+        <table class="table table-hover mt-4">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(u => { %>
+                    <tr onclick="window.location.href='/user/<%= u.userID %>'" style="cursor:pointer;">
+                        <td><%= u.userID %></td>
+                        <td><%= u.username %></td>
+                        <td><%= u.email_address %></td>
+                        <td><%= u.phone_number %></td>
+                        <td><%= u.age %></td>
+                        <td><%= u.gender %></td>
+                        <td><%= u.role %></td>
+                        <td class="text-nowrap">
+                            <a href="/updateUser/<%= u.userID %>" class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation()">Update</a>
+                            <form action="/deleteUser/<%= u.userID %>" method="POST" class="d-inline" onclick="event.stopPropagation()">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <a href="/logout" class="btn btn-outline-danger">Logout</a>
     </div>
 </body>
 </html>
