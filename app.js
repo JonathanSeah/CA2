@@ -67,7 +67,7 @@ const checkAdmin = (req, res, next) => {
     }
 };
 
-app.use('/Pic',express.static('Pic/images')); // Serve static files from the 'public' directory
+
 
 // Middleware to parse request bodies
 app.use(express.urlencoded({ extended: true }));
