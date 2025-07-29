@@ -279,7 +279,7 @@ app.get('/', (req, res) => {
 });
 
 
-
+// User get - Jonathan ----------------------------------------//
 app.get('/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
   const userID = req.params.id;
   const sql = 'SELECT * FROM user WHERE userID = ?';
@@ -293,8 +293,8 @@ app.get('/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
     }
 
     res.render('user', {
-      user: req.session.user,        // still your logged-in admin
-      selectedUser: results[0],      // the record you clicked
+      user: req.session.user,
+      selectedUser: results[0],
       messages: req.flash('success')
     });
   });
@@ -375,7 +375,7 @@ app.post(
     }
   }
 );
-//--------------------------------------------------------------//
+
 
 //add food - Jonathan-------------------------------------------//
 app.get('/addFood', isLoggedIn, (req, res) => {
@@ -406,7 +406,7 @@ app.post('/addFood', isLoggedIn, upload.single('foodImage'), async (req, res) =>
     res.redirect('/addFood');
   }
 });
-//---------------------------------------------------------------//
+
 
 // update exercise -Elden-------------------------------------//
 app.get('/updateExercise/:id', checkAuthenticated, (req, res) => {
@@ -530,6 +530,7 @@ app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
 });
 //---------------------------------------------------------------//
 
+// update User - Jonathan ---------------------------------------//
 app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
   const userID = req.params.id;
   const sql = 'SELECT * FROM user WHERE userID = ?';
