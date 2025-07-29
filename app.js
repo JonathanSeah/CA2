@@ -408,11 +408,125 @@ app.post('/addFood', isLoggedIn, upload.single('foodImage'), async (req, res) =>
 //---------------------------------------------------------------//
 
 // update exercise -Elden-------------------------------------//
+app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
+  const foodID = req.params.id;
+  const sql = 'SELECT * FROM food_tracker WHERE foodID = ?';  // Fetch food data by ID          
+  connection.query(sql, [foodID], (error, results) => {
+    if (error) {
+      console.error("Error fetching food:", error);
+      return res.status(500).send('Error fetching food');
+    } else if (results.length === 0) {
+      return res.status(404).send('Food not found');
+    } else {
+      const food = results[0];
+      // Only allow if user owns the food or is admin
+      if (
+        req.session.user.role === 'admin' ||
+        food.userID === req.session.user.userID
+      ) {
+        res.render('updateFood', { food, messages: req.flash('error') });
+      } else {
+        req.flash('error', 'Unauthorized to update this food entry.');
+        return res.redirect('/dashboard');
+      }
+    }
+  });
+});
 
+app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
+  const foodID = req.params.id;
+  const { food_name, carbs, protein, calories, fats } = req.body;
+
+  // First, fetch the food entry to check ownership or admin
+  const fetchSql = 'SELECT userID FROM food_tracker WHERE foodID = ?';
+  connection.query(fetchSql, [foodID], (fetchErr, results) => {
+    if (fetchErr) {
+      console.error("Error fetching food for update:", fetchErr);
+      return res.status(500).send('Error fetching food');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('Food not found');
+    }
+    const foodOwnerId = results[0].userID;
+    const currentUser = req.session.user;
+
+    // Only allow if current user is owner or admin
+    if (currentUser.userID !== foodOwnerId && currentUser.role !== 'admin') {
+      req.flash('error', 'Unauthorized to update this food entry.');
+      return res.redirect('/dashboard');
+    }
+
+    const updateSql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ? WHERE foodID = ?';
+    connection.query(updateSql, [food_name, carbs, protein, calories, fats, foodID], (updateErr) => {
+      if (updateErr) {
+        console.error("Error updating food:", updateErr);
+        return res.status(500).send('Error updating food');
+      }
+      res.redirect('/dashboard');
+    });
+  });
+});
 //---------------------------------------------------------------//
 
 // update food -Elden ----------------------------------------//
+app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
+  const foodID = req.params.id;
+  const sql = 'SELECT * FROM food_tracker WHERE foodID = ?';  // Fetch food data by ID          
+  connection.query(sql, [foodID], (error, results) => {
+    if (error) {
+      console.error("Error fetching food:", error);
+      return res.status(500).send('Error fetching food');
+    } else if (results.length === 0) {
+      return res.status(404).send('Food not found');
+    } else {
+      const food = results[0];
+      // Only allow if user owns the food or is admin
+      if (
+        req.session.user.role === 'admin' ||
+        food.userID === req.session.user.userID
+      ) {
+        res.render('updateFood', { food, messages: req.flash('error') });
+      } else {
+        req.flash('error', 'Unauthorized to update this food entry.');
+        return res.redirect('/dashboard');
+      }
+    }
+  });
+});
 
+app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
+  const foodID = req.params.id;
+  const { food_name, carbs, protein, calories, fats } = req.body;
+
+  // First, fetch the food entry to check ownership or admin
+  const fetchSql = 'SELECT userID FROM food_tracker WHERE foodID = ?';
+  connection.query(fetchSql, [foodID], (fetchErr, results) => {
+    if (fetchErr) {
+      console.error("Error fetching food for update:", fetchErr);
+      return res.status(500).send('Error fetching food');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('Food not found');
+    }
+    const foodOwnerId = results[0].userID;
+    const currentUser = req.session.user;
+
+    // Only allow if current user is owner or admin
+    if (currentUser.userID !== foodOwnerId && currentUser.role !== 'admin') {
+      req.flash('error', 'Unauthorized to update this food entry.');
+      return res.redirect('/dashboard');
+    }
+
+    const updateSql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ? WHERE foodID = ?';
+    connection.query(updateSql, [food_name, carbs, protein, calories, fats, foodID], (updateErr) => {
+      if (updateErr) {
+        console.error("Error updating food:", updateErr);
+        return res.status(500).send('Error updating food');
+      }
+      res.redirect('/dashboard');
+    });
+  });
+});
 //---------------------------------------------------------------//
 
 app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
