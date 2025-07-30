@@ -485,21 +485,23 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 
 // View All Foods
 app.get('/view-foods', (req, res) => {
-  // Search function - Alaric
+  const userID = req.session.user.userID; // ensure user is logged in
   const term = req.query.search ? req.query.search.toLowerCase() : '';
-  let sql = 'SELECT * FROM food_tracker';
-  let values = [];
+  let sql = 'SELECT * FROM food_tracker WHERE userID = ?';
+  let values = [userID];
 
   if (term) {
-    sql += ' WHERE LOWER(food_name) LIKE ?';
+    sql += ' AND LOWER(food_name) LIKE ?';
     values.push('%' + term + '%');
   }
 
   connection.query(sql, values, (err, results) => {
     if (err) throw err;
 
-    // Add a searchTerm so EJS can display it back in the input box
-    res.render('viewFoods', { foods: results, searchTerm: term });
+    res.render('viewFoods', {
+      foods: results,
+      searchTerm: term
+    });
   });
 });
 
