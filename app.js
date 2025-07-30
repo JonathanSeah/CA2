@@ -656,7 +656,7 @@ app.get('/deleteExercise/:id', (req, res) => {
             console.error('Error deleting exercise:', error);
             res.status(500).send('Error deleting exercise');
         } else {
-            res.redirect('/');
+            res.redirect('/view-exercises');
         }
     });
 });
@@ -671,7 +671,7 @@ app.get('/deleteFood/:id', (req, res) => {
             console.error('Error deleting food:', error);
             res.status(500).send('Error deleting food');
         } else {
-            res.redirect('/viewFoods');
+            res.redirect('/view-foods');
         }
     });
 });
