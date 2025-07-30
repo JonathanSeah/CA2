@@ -485,7 +485,7 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 
 // View All Foods
 app.get('/view-foods', (req, res) => {
-  const userID = req.session.user.userID; // ensure user is logged in
+  const userID = req.session.user.userID; // Get the logged-in user's ID
   const term = req.query.search ? req.query.search.toLowerCase() : '';
   let sql = 'SELECT * FROM food_tracker WHERE userID = ?';
   let values = [userID];
@@ -496,7 +496,10 @@ app.get('/view-foods', (req, res) => {
   }
 
   connection.query(sql, values, (err, results) => {
-    if (err) throw err;
+    if (err) {
+      console.error('Error fetching food:', err);
+      return res.status(500).send('Internal server error');
+    }
 
     res.render('viewFoods', {
       foods: results,
@@ -504,6 +507,7 @@ app.get('/view-foods', (req, res) => {
     });
   });
 });
+
 
 // View All Exercises
 app.get('/view-exercises', (req, res) => {
