@@ -425,22 +425,22 @@ app.get('/updateExercise/:id', checkAuthenticated, (req, res) => {
   const sql = 'SELECT * FROM exercise_tracker WHERE exerciseID = ?';  // Fetch food data by ID          
   connection.query(sql, [exerciseID], (error, results) => {
     if (error) {
-      console.error("Error fetching exercises:", error);
-      return res.status(500).send('Error fetching exercises');
+      console.error("Error fetching exercise:", error);
+      return res.status(500).send('Error fetching exercise');
     } else if (results.length === 0) {
-      return res.status(404).send('Exercise not found');
+      return res.status(404).send('exercise not found');
     } else {
       const exercise = results[0];
       // Only allow if user owns the food or is admin
-      if (
-        req.session.user.role === 'admin' ||
-        exercise.userID === req.session.user.userID
-      ) {
+      //if (
+        //req.session.user.role === 'admin' ||
+       // exercise.userID === req.session.user.userID
+      //) {
         res.render('updateExercise', { exercise, messages: req.flash('error') });
-      } else {
-        req.flash('error', 'Unauthorized to update this exercise entry.');
-        return res.redirect('/dashboard');
-      }
+      //} else {
+        //req.flash('error', 'Unauthorized to update this food entry.');
+       // return res.redirect('/dashboard');
+     // }
     }
   });
 });
@@ -468,8 +468,8 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
       return res.redirect('/dashboard');
     }
 
-    const updateSql = 'UPDATE exercise_tracker SET exercise_name = ?, types = ?, rep = ?, set = ? WHERE exerciseID = ?';
-    connection.query(updateSql, [exercise_name, types , rep, set, exerciseID], (updateErr) => {
+    const updateSql = 'UPDATE exercise_tracker SET exercise_name = ?, types = ?, reps = ?, sets = ? WHERE exerciseID = ?';
+    connection.query(updateSql, [exercise_name, types , reps, sets, exerciseID], (updateErr) => {
       if (updateErr) {
         console.error("Error updating exercise:", updateErr);
         return res.status(500).send('Error updating exercise');

@@ -11,46 +11,78 @@
   </head>
   <body>
     <div class="container py-5">
-      <h2 class="mb-4">Update exercise</h2>
-      <% if (message && message.length) { %>
-      <div class="alert alert-danger"><%= message %></div>
-      <% } %>
-      <form
-        action="/update-exercise/<%= exercise._id %>"
-        method="POST"
-        enctype="multipart/form-data"
-        class="row g-3"
-      >
-        <div class="col-md-6">
-          <label class="form-label">Exercise Name</label>
-          <input
-            type="text"
-            name="exercise_name"
-            class="form-control"
-            maxlength="45"
-            required
-            value="<%= exercise.exercise_name %>"
-          />
-            </div>
-        <div class="col-md-3">
-          <label class="form-label">Types </label>
-          <input type="number" name="types" class="form-control" required value="<%= exercise.types %>" />
-        </div>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Reps </label>
-          <input type="number" name="reps" class="form-control" required value="<%= exercise.rep %>" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Set </label>
-          <input type="number" name="set" class="form-control" required value="<%= exercise.set %>" />
-        </div>
+      <!-- Left-aligned heading -->
+      <h1 class="mb-4">Update Exercise</h1>
 
-        <div class="col-12">
-          <button class="btn btn-success">Save</button>
-          <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
+      <!-- Centered content starts here -->
+      <div class="d-flex justify-content-center">
+        <div class="w-100" style="max-width: 800px;">
+          <% if (messages && messages.length) { %>
+          <div class="alert alert-danger">
+            <% messages.forEach(function(msg) { %>
+              <p><%= msg %></p>
+            <% }); %>
+          </div>
+          <% } %>
+
+          <form
+            action="/updateExercise/<%= exercise.exerciseID %>"
+            method="POST"
+            enctype="multipart/form-data"
+            class="row g-3"
+          >
+            <div class="col-12">
+              <label class="form-label">Exercise Name</label>
+              <input
+                type="text"
+                name="exercise_name"
+                class="form-control"
+                maxlength="45"
+                required
+                value="<%= exercise.exercise_name %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Types</label>
+              <input
+                type="text"
+                name="types"
+                class="form-control"
+                required
+                value="<%= exercise.types %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Reps</label>
+              <input
+                type="number"
+                name="reps"
+                class="form-control"
+                required
+                value="<%= exercise.reps %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Sets</label>
+              <input
+                type="number"
+                name="sets"
+                class="form-control"
+                required
+                value="<%= exercise.sets %>"
+              />
+            </div>
+           
+            <div class="col-12 text-center">
+              <button class="btn btn-success">Save</button>
+              <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </body>
 </html>

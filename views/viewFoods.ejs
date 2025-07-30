@@ -10,52 +10,52 @@
     />
   </head>
   <body>
-    <div class="container py-5">
-      <h2 class="mb-4">Food Log</h2>
-      <form method="GET" class="mb-3">
-        <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
-        <button type="submit" class="btn btn-secondary">Search Food...</button>
-      </form>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Food Name</th>
-            <th>Calories</th>
-            <th>Carbs (g)</th>
-            <th>Protein (g)</th>
-            <th>Fats (g)</th>
-            <th>Image</th>
-            <th>Actions</th> <!-- New column for actions -->
-          </tr>
-        </thead>
-        <tbody>
-          <% for (var i = 0; i < foods.length; i++) { %>
-            <tr>
-              <td><%= foods[i].food_name %></td>
-              <td><%= foods[i].calories %></td>
-              <td><%= foods[i].carbs %></td>
-              <td><%= foods[i].protein %></td>
-              <td><%= foods[i].fats %></td>
-              <td>
-                  <% if (foods[i].image) { %>
-                  <img src="<%= foods[i].image %>" alt="Food Image" class="img-fluid" style="max-width: 100px;">
-                    <% } else { %>
-                  <span>No image</span>
-                  <% } %>
-              </td>
+      <div class="container py-5 d-flex flex-column align-items-center">
+        <h2 class="mb-4">Food Log</h2>
+        <form method="GET" class="mb-3 w-100 d-flex justify-content-center gap-2">
+          <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
+          <button type="submit" class="btn btn-secondary">Search Food</button>
+        </form>
+          <table class="table table-bordered text-center align-middle">
+            <thead>
+              <tr>
+                <th>Food Name</th>
+                <th>Calories</th>
+                <th>Carbs (g)</th>
+                <th>Protein (g)</th>
+                <th>Fats (g)</th>
+                <th>Image</th>
+                <th>Actions</th> <!-- New column for actions -->
+              </tr>
+            </thead>
+            <tbody>
+              <% for (var i = 0; i < foods.length; i++) { %>
+                <tr>
+                  <td><%= foods[i].food_name %></td>
+                  <td><%= foods[i].calories %></td>
+                  <td><%= foods[i].carbs %></td>
+                  <td><%= foods[i].protein %></td>
+                  <td><%= foods[i].fats %></td>
+                  <td>
+                      <% if (foods[i].image) { %>
+                      <img src="<%= foods[i].image %>" alt="Food Image" class="img-fluid" style="max-width: 100px;">
+                        <% } else { %>
+                      <span>No image</span>
+                      <% } %>
+                  </td>
 
-              <td>
-                <div class="d-flex gap-2">
-                  <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
-                  <form action="/deleteFood/<%= foods[i].foodID %>" method="POST" class="d-inline">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-          <% } %>
-        </tbody>
-      </table>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
+                      <form action="/deleteFood/<%= foods[i].foodID %>" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
       <div class="d-flex gap-2 mb-3">
         <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
         <a href="/addFood" class="btn btn-success">+ Add Food</a>
