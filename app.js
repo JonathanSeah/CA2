@@ -646,7 +646,7 @@ app.post('/deleteUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
   });
 });
 
-app.get('/deleteExercise/:id', (req, res) => {
+app.post('/deleteExercise/:id', (req, res) => {
     const exerciseID = req.params.id;
     const sql = 'DELETE FROM exercise_tracker WHERE exerciseID = ?';
     
@@ -661,7 +661,7 @@ app.get('/deleteExercise/:id', (req, res) => {
     });
 });
 
-app.get('/deleteFood/:id', (req, res) => {
+app.post('/deleteFood/:id', (req, res) => {
     const foodID = req.params.id;
     const sql = 'DELETE FROM food_tracker WHERE foodID = ?';
     
