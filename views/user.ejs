@@ -20,7 +20,7 @@
           <li class="list-group-item"><strong>Gender:</strong> <%= selectedUser.gender %></li>
         </ul>
         <div class="mt-3">
-          <a href="/updateUser/<%= selectedUser.userID %>" class="btn btn-primary me-2">Edit</a>
+          <a href="/updateUser/<%= selectedUser.userID %>" class="btn btn-primary mr-2">Edit</a>
           <form action="/deleteUser/<%= selectedUser.userID %>" method="POST" class="d-inline">
             <button type="submit" class="btn btn-danger">Delete</button>
           </form>
