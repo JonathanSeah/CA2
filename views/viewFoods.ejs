@@ -42,13 +42,12 @@
                     <% } else { %>
                   <span>No image</span>
                   <% } %>
-                
-
               </td>
+
               <td>
                 <div class="d-flex gap-2">
                   <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
-                  <form action="/deleteFood/<%= foods[i].foodID %>" method="POST">
+                  <form action="/deleteFood/<%= foods[i].foodID %>" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-danger">Delete</button>
                   </form>
                 </div>
