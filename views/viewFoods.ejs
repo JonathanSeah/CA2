@@ -12,10 +12,6 @@
   <body>
     <div class="container py-5">
       <h2 class="mb-4">Food Log</h2>
-      <form method="GET" class="mb-3">
-        <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
-        <button type="submit" class="btn btn-secondary">Search Food...</button>
-      </form>
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -25,6 +21,7 @@
             <th>Protein (g)</th>
             <th>Fats (g)</th>
             <th>Image</th>
+            <th>Actions</th> <!-- New column for actions -->
           </tr>
         </thead>
         <tbody>
@@ -41,6 +38,12 @@
                 <% } else { %>
                   No image
                 <% } %>
+              </td>
+              <td>
+                <!-- Delete button form for each food item -->
+                <form action="/deleteFood/<%= foods[i].foodID %>" method="GET">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
               </td>
             </tr>
           <% } %>
