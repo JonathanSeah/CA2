@@ -16,6 +16,8 @@ fs.mkdirSync(uploadDir, { recursive: true });
 
 // Create an Express application
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //set up multer for file uploads
 const storage = multer.diskStorage({
