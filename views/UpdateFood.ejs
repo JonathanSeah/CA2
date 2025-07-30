@@ -12,9 +12,14 @@
   <body>
     <div class="container py-5">
       <h2 class="mb-4">Update food</h2>
-      <% if (message && message.length) { %>
-      <div class="alert alert-danger"><%= message %></div>
-      <% } %>
+      <% if (messages && messages.length) { %>
+      <div class="alert alert-danger">
+      <% messages.forEach(function(msg) { %>
+        <p><%= msg %></p>
+      <% }); %>
+    </div>
+    <% } %>
+
       <form
         action="/update-food/<%= food._id %>"
         method="POST"
