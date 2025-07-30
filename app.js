@@ -435,7 +435,7 @@ app.get('/updateExercise/:id', checkAuthenticated, (req, res) => {
 
 app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
   const exerciseID = req.params.id;
-  const { exercise_name, types , rep, set } = req.body;
+  const { exercise_name, types , reps, sets } = req.body;
 
   // First, fetch the food entry to check ownership or admin
   const fetchSql = 'SELECT userID FROM exercise_tracker WHERE exerciseID = ?';
