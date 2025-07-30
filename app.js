@@ -180,12 +180,7 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
       console.error('DB error on /admin:', err);
       return res.status(500).send('Database error');
     }
-    res.render('admin', {
-      user: req.session.user,
-      users,
-      messages: req.flash('success'),
-      searchTerm: term 
-    });
+    res.render('admin', {user: req.session.user, users, messages: req.flash('success'), searchTerm: term});
   });
 });
 
@@ -303,11 +298,7 @@ app.get('/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    res.render('user', {
-      user: req.session.user,
-      selectedUser: results[0],
-      messages: req.flash('success')
-    });
+    res.render('user', {user: req.session.user, selectedUser: results[0], messages: req.flash('success')});
   });
 });
 
@@ -379,10 +370,7 @@ app.post(
       );
       req.flash('info', 'Exercise added successfully.');
       res.redirect('/dashboard');
-    } catch (err) {
-      console.error(err);
-      req.flash('error', 'Could not add exercise.');
-      res.redirect('/addExercise');
+    } catch (err) {console.error(err); req.flash('error', 'Could not add exercise.'); res.redirect('/addExercise');
     }
   }
 );
@@ -486,6 +474,7 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 // View All Foods
 app.get('/view-foods', (req, res) => {
   const userID = req.session.user.userID; // Get the logged-in user's ID
+  // Search function - Alaric
   const term = req.query.search ? req.query.search.toLowerCase() : '';
   let sql = 'SELECT * FROM food_tracker WHERE userID = ?';
   let values = [userID];
@@ -511,13 +500,14 @@ app.get('/view-foods', (req, res) => {
 
 // View All Exercises
 app.get('/view-exercises', (req, res) => {
+  const userID = req.session.user.userID; // Get the logged-in user's ID
   // Search function - Alaric
   const term = req.query.search ? req.query.search.toLowerCase() : '';
-  let sql = 'SELECT * FROM exercise_tracker';
-  let values = [];
+  let sql = 'SELECT * FROM exercise_tracker WHERE userID = ?';
+  let values = [userID];
 
   if (term) {
-    sql += ' WHERE LOWER(exercise_name) LIKE ?';
+    sql += ' AND LOWER(exercise_name) LIKE ?';
     values.push('%' + term + '%');
   }
 
@@ -602,10 +592,7 @@ app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
       req.flash('error','User not found');
       return res.redirect('/admin');
     }
-    res.render('updateUser', {
-      user:        req.session.user,
-      selectedUser: results[0],
-      messages:    req.flash('error')
+    res.render('updateUser', {user: req.session.user, selectedUser: results[0], messages: req.flash('error')
     });
   });
 });
