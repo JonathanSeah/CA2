@@ -16,7 +16,7 @@
       <!-- Search form -->
       <form method="GET" class="mb-3">
         <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2" />
-        <button type="submit" class="btn btn-secondary">Search Exercise...</button>
+        <button type="submit" class="btn btn-secondary">Search Exercise</button>
       </form>
 
       <!-- Exercise table -->
@@ -30,6 +30,7 @@
             <th>Actions</th>
           </tr>
         </thead>
+        
         <tbody>
           <% for (var i = 0; i < exercises.length; i++) { %>
             <tr>
@@ -37,11 +38,13 @@
               <td><%= exercises[i].types %></td>
               <td><%= exercises[i].reps %></td>
               <td><%= exercises[i].sets %></td>
-              <td class="d-flex gap-2">
-                <a href="/update-exercise/<%= exercises[i].exerciseID %>" class="btn btn-outline-primary">Update</a>
-                <form action="/deleteExercise/<%= exercises[i].exerciseID %>" method="POST">
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+              <td>
+                <div class="d-flex gap-2">
+                  <a href="/updateExercise/<%= exercises[i].exerciseID %>" class="btn btn-outline-primary">Update</a>
+                  <form action="/deleteExercise/<%= exercises[i].exerciseID %>" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </div>
               </td>
             </tr>
           <% } %>

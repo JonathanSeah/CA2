@@ -11,68 +11,108 @@
   </head>
   <body>
     <div class="container py-5">
-      <h2 class="mb-4">Update food</h2>
-      <% if (messages && messages.length) { %>
-      <div class="alert alert-danger">
-      <% messages.forEach(function(msg) { %>
-        <p><%= msg %></p>
-      <% }); %>
-    </div>
-    <% } %>
+      <!-- Left-aligned heading -->
+      <h1 class="mb-4">Update Food</h1>
 
-      <form
-        action="/update-food/<%= food._id %>"
-        method="POST"
-        enctype="multipart/form-data"
-        class="row g-3"
-      >
-        <div class="col-md-6">
-          <label class="form-label">Food Name</label>
-          <input
-            type="text"
-            name="food_name"
-            class="form-control"
-            maxlength="45"
-            required
-            value="<%= food.food_name %>"
-          />
-            </div>
-        <div class="col-md-3">
-          <label class="form-label">Carbs (g)</label>
-          <input type="number" name="carbs" class="form-control" required value="<%= food.carbs %>" />
-        </div>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Protein (g)</label>
-          <input type="number" name="protein" class="form-control" required value="<%= food.protein %>" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Fats (g)</label>
-          <input type="number" name="fats" class="form-control" required value="<%= food.fats %>" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Calories</label>
-          <input type="number" name="calories" class="form-control" required value="<%= food.calories %>" />
-        </div>
-        <div class="col-12">
-          <label class="form-label">Image</label>
-          <% if (food.imageUrl) { %>
-            <div class="mb-2">
-              <img src="<%= food.imageUrl %>" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
-            </div>
+      <!-- Centered content starts here -->
+      <div class="d-flex justify-content-center">
+        <div class="w-100" style="max-width: 800px;">
+          <% if (messages && messages.length) { %>
+          <div class="alert alert-danger">
+            <% messages.forEach(function(msg) { %>
+              <p><%= msg %></p>
+            <% }); %>
+          </div>
           <% } %>
-          <input
-            type="file"
-            name="foodImage"
-            class="form-control"
-            accept="image/*"
-          />
+
+          <form
+            action="/updateFood/<%= food.foodID %>"
+            method="POST"
+            enctype="multipart/form-data"
+            class="row g-3"
+          >
+            <div class="col-12">
+              <label class="form-label">Food Name</label>
+              <input
+                type="text"
+                name="food_name"
+                class="form-control"
+                maxlength="45"
+                required
+                value="<%= food.food_name %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Carbs (g)</label>
+              <input
+                type="number"
+                name="carbs"
+                class="form-control"
+                required
+                value="<%= food.carbs %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Protein (g)</label>
+              <input
+                type="number"
+                name="protein"
+                class="form-control"
+                required
+                value="<%= food.protein %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Fats (g)</label>
+              <input
+                type="number"
+                name="fats"
+                class="form-control"
+                required
+                value="<%= food.fats %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Calories</label>
+              <input
+                type="number"
+                name="calories"
+                class="form-control"
+                required
+                value="<%= food.calories %>"
+              />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Image</label>
+              <% if (food.imageUrl) { %>
+              <div class="mb-2">
+                <img
+                  src="<%= food.imageUrl %>"
+                  alt="Current Image"
+                  style="max-width: 200px; max-height: 200px"
+                />
+              </div>
+              <% } %>
+              <input
+                type="file"
+                name="foodImage"
+                class="form-control"
+                accept="image/*"
+              />
+            </div>
+
+            <div class="col-12 text-center">
+              <button class="btn btn-success">Save</button>
+              <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+          </form>
         </div>
-        <div class="col-12">
-          <button class="btn btn-success">Save</button>
-          <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
-        </div>
-      </form>
+      </div>
     </div>
   </body>
 </html>
