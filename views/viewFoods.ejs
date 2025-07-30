@@ -37,13 +37,12 @@
               <td><%= foods[i].protein %></td>
               <td><%= foods[i].fats %></td>
               <td>
-                <td>
                   <% if (foods[i].image) { %>
                   <img src="<%= foods[i].image %>" alt="Food Image" class="img-fluid" style="max-width: 100px;">
                     <% } else { %>
                   <span>No image</span>
                   <% } %>
-                </td>
+                
 
               </td>
               <td class="d-flex gap-2">
