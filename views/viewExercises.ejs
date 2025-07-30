@@ -24,8 +24,9 @@
         <thead>
           <tr>
             <th>Exercise Name</th>
-            <th>Sets</th>
+            <th>Type</th>
             <th>Reps</th>
+            <th>Sets</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -33,6 +34,7 @@
           <% for (var i = 0; i < exercises.length; i++) { %>
             <tr>
               <td><%= exercises[i].exercise_name %></td>
+              <td><%= exercises[i].types %></td>
               <td><%= exercises[i].reps %></td>
               <td><%= exercises[i].sets %></td>
               <td class="d-flex gap-2">
