@@ -507,7 +507,7 @@ app.get('/view-exercises', (req, res) => {
   let values = [userID];
 
   if (term) {
-    sql += ' WHERE LOWER(exercise_name) LIKE ?';
+    sql += ' AND LOWER(exercise_name) LIKE ?';
     values.push('%' + term + '%');
   }
 
