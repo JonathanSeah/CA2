@@ -671,7 +671,7 @@ app.get('/deleteFood/:id', (req, res) => {
             console.error('Error deleting food:', error);
             res.status(500).send('Error deleting food');
         } else {
-            res.redirect('/');
+            res.redirect('/viewFoods');
         }
     });
 });
