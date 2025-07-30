@@ -72,50 +72,37 @@
   </div>
 </div>
 <script>
-(() => {
+(function () {
   const users = <%- JSON.stringify(users || []) %>;
 
-  const ages = users.map(u => Number(u.age)).filter(n => Number.isFinite(n) && n >= 0);
-  const buckets = [
-    {label:'<18',  test:a=>a < 18},
-    {label:'18–24', test:a=>a >= 18 && a <= 24},
-    {label:'25–34', test:a=>a >= 25 && a <= 34},
-    {label:'35–44', test:a=>a >= 35 && a <= 44},
-    {label:'45–54', test:a=>a >= 45 && a <= 54},
-    {label:'55–64', test:a=>a >= 55 && a <= 64},
-    {label:'65+',   test:a=>a >= 65}
-  ];
-  const ageCounts = buckets.map(b => ages.reduce((acc,a)=>acc + (b.test(a)?1:0), 0));
+  const ageLabels = ['<18','18–24','25–34','35–44','45–54','55–64','65+'];
+  const ageCounts = Array(7).fill(0);
+  const genderCounts = { Male:0, Female:0, Other:0, Unspecified:0 };
 
-  const gmap = new Map();
-  users.forEach(u => {
-    const g = (u.gender || '').toString().trim().toLowerCase();
-    const norm = g.startsWith('m') ? 'Male'
-               : g.startsWith('f') ? 'Female'
-               : g ? g.charAt(0).toUpperCase()+g.slice(1)
-               : 'Unspecified';
-    gmap.set(norm, (gmap.get(norm)||0)+1);
-  });
-  const genderLabels = Array.from(gmap.keys());
-  const genderCounts = Array.from(gmap.values());
-
-  new Chart(document.getElementById('ageChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: buckets.map(b => b.label),
-      datasets: [{ label: 'Users', data: ageCounts }]
-    },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-      plugins: { legend: { display: false } }
+  for (const { age, gender } of users) {
+    const a = Number(age);
+    if (Number.isFinite(a) && a >= 0) {
+      ageCounts[a < 18 ? 0 : a <= 24 ? 1 : a <= 34 ? 2 : a <= 44 ? 3 : a <= 54 ? 4 : a <= 64 ? 5 : 6]++;
     }
+    const g = String(gender || '').trim().toLowerCase();
+    if (!g) genderCounts.Unspecified++;
+    else if (g[0] === 'm') genderCounts.Male++;
+    else if (g[0] === 'f') genderCounts.Female++;
+    else genderCounts.Other++;
+  }
+
+  const gLabels = Object.keys(genderCounts).filter(k => genderCounts[k] > 0);
+  const gData = gLabels.map(k => genderCounts[k]);
+
+  new Chart(document.getElementById('ageChart'), {
+    type: 'bar',
+    data: { labels: ageLabels, datasets: [{ data: ageCounts, label: 'Users' }] },
+    options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
   });
 
-  new Chart(document.getElementById('genderChart').getContext('2d'), {
+  new Chart(document.getElementById('genderChart'), {
     type: 'pie',
-    data: { labels: genderLabels, datasets: [{ data: genderCounts }] },
-    options: { responsive: true }
+    data: { labels: gLabels, datasets: [{ data: gData }] }
   });
 })();
 </script>
