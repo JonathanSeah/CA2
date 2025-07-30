@@ -8,6 +8,10 @@
   <body>
     <div class="container mt-5">
       <h2 class="mb-4">Exercise Log</h2>
+      <form method="GET" class="mb-3">
+        <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
+        <button type="submit" class="btn btn-secondary">Search Exercise...</button>
+      </form>
       <table class="table table-bordered">
         <thead>
           <tr>
