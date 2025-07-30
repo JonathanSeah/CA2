@@ -46,8 +46,8 @@
                 </td>
 
               </td>
-              <td>
-                <!-- Delete button form for each food item -->
+              <td class="d-flex gap-2">
+                <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
                 <form action="/deleteFood/<%= foods[i].foodID %>" method="GET">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
