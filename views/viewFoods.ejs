@@ -45,11 +45,13 @@
                 
 
               </td>
-              <td class="d-flex gap-2">
-                <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
-                <form action="/deleteFood/<%= foods[i].foodID %>" method="GET">
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+              <td>
+                <div class="d-flex gap-2">
+                  <a href="/updateFood/<%= foods[i].foodID %>" class="btn btn-outline-primary">Update</a>
+                  <form action="/deleteFood/<%= foods[i].foodID %>" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </div>
               </td>
             </tr>
           <% } %>
