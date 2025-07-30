@@ -180,12 +180,7 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
       console.error('DB error on /admin:', err);
       return res.status(500).send('Database error');
     }
-    res.render('admin', {
-      user: req.session.user,
-      users,
-      messages: req.flash('success'),
-      searchTerm: term 
-    });
+    res.render('admin', {user: req.session.user, users, messages: req.flash('success'), searchTerm: term});
   });
 });
 
@@ -303,11 +298,7 @@ app.get('/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    res.render('user', {
-      user: req.session.user,
-      selectedUser: results[0],
-      messages: req.flash('success')
-    });
+    res.render('user', {user: req.session.user, selectedUser: results[0], messages: req.flash('success')});
   });
 });
 
@@ -379,10 +370,7 @@ app.post(
       );
       req.flash('info', 'Exercise added successfully.');
       res.redirect('/dashboard');
-    } catch (err) {
-      console.error(err);
-      req.flash('error', 'Could not add exercise.');
-      res.redirect('/addExercise');
+    } catch (err) {console.error(err); req.flash('error', 'Could not add exercise.'); res.redirect('/addExercise');
     }
   }
 );
@@ -604,10 +592,7 @@ app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
       req.flash('error','User not found');
       return res.redirect('/admin');
     }
-    res.render('updateUser', {
-      user:        req.session.user,
-      selectedUser: results[0],
-      messages:    req.flash('error')
+    res.render('updateUser', {user: req.session.user, selectedUser: results[0], messages: req.flash('error')
     });
   });
 });
