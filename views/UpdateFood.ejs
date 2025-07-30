@@ -12,7 +12,7 @@
   <body>
     <div class="container py-5">
       <h2 class="mb-4">Update food</h2>
-      <% if (message.length) { %>
+      <% if (message && message.length) { %>
       <div class="alert alert-danger"><%= message %></div>
       <% } %>
       <form
@@ -29,21 +29,44 @@
             class="form-control"
             maxlength="45"
             required
+            value="<%= food.food_name %>"
           />
             </div>
         <div class="col-md-3">
-          <label class="form-label">Carbs (g)</label>
+          <input type="number" name="carbs" class="form-control" required value="<%= food.carbs %>" />
           <input type="number" name="carbs" class="form-control" required />
         </div>
         <div class="col-md-3">
           <label class="form-label">Protein (g)</label>
-          <input type="number" name="protein" class="form-control" required />
+          <input type="number" name="protein" class="form-control" required value="<%= food.protein %>" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Fats (g)</label>
-          <input type="number" name="fats" class="form-control" required />
+          <input type="number" name="fats" class="form-control" required value="<%= food.fats %>" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Calories</label>
-          <input type="number" name="calories" class="form-control" required />
+          <input type="number" name="calories" class="form-control" required value="<%= food.calories %>" />
         </div>
+        <div class="col-12">
+          <label class="form-label">Image</label>
+          <% if (food.imageUrl) { %>
+            <div class="mb-2">
+              <img src="<%= food.imageUrl %>" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
+            </div>
+          <% } %>
+          <input
+            type="file"
+            name="foodImage"
+            class="form-control"
+            accept="image/*"
+          />
+        </div>
+        <div class="col-12">
+          <button class="btn btn-success">Save</button>
+          <a href="/dashboard" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
