@@ -165,19 +165,30 @@ app.post('/login', (req, res) => {
 
 //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
 app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
-  const sql = 'SELECT * FROM user';
-  connection.query(sql, (err, users) => {
+  // Search function - Alaric
+  const term = req.query.search ? req.query.search.toLowerCase() : '';
+  let sql = 'SELECT * FROM user';
+  let values = [];
+
+  if (term) {
+    sql += ' WHERE LOWER(username) LIKE ?';
+    values.push('%' + term + '%');
+  }
+
+  connection.query(sql, values, (err, users) => {
     if (err) {
       console.error('DB error on /admin:', err);
       return res.status(500).send('Database error');
     }
     res.render('admin', {
-      user: req.session.user,     // for your navbar
-      users,                      // feeds your Bootstrap table
-      messages: req.flash('success')
+      user: req.session.user,
+      users,
+      messages: req.flash('success'),
+      searchTerm: term 
     });
   });
 });
+
 
 app.get('/dashboard', checkAuthenticated, (req, res) => {
     if (req.session.user.role === 'admin') {
@@ -473,21 +484,42 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 //View All Items -Bao Rui
 
 // View All Foods
-app.get('/view-foods', checkAuthenticated, (req, res) => {
-  const userID = req.session.user.userID;
-  connection.query('SELECT * FROM food_tracker ', (err, results) => {
+app.get('/view-foods', (req, res) => {
+  // Search function - Alaric
+  const term = req.query.search ? req.query.search.toLowerCase() : '';
+  let sql = 'SELECT * FROM food_tracker';
+  let values = [];
+
+  if (term) {
+    sql += ' WHERE LOWER(food_name) LIKE ?';
+    values.push('%' + term + '%');
+  }
+
+  connection.query(sql, values, (err, results) => {
     if (err) throw err;
-    res.render('viewFoods', { foods: results });
+
+    // Add a searchTerm so EJS can display it back in the input box
+    res.render('viewFoods', { foods: results, searchTerm: term });
   });
 });
 
+// View All Exercises
+app.get('/view-exercises', (req, res) => {
+  // Search function - Alaric
+  const term = req.query.search ? req.query.search.toLowerCase() : '';
+  let sql = 'SELECT * FROM exercise_tracker';
+  let values = [];
 
-// View All Exercises!!
-app.get('/view-exercises', function (req, res) {
-    connection.query('SELECT * FROM exercise_tracker', function (err, results) {
-        if (err) throw err;
-        res.render('viewExercises', { exercises: results });
-    });
+  if (term) {
+    sql += ' WHERE LOWER(exercise_name) LIKE ?';
+    values.push('%' + term + '%');
+  }
+
+  connection.query(sql, values, (err, results) => {
+    if (err) throw err;
+
+    res.render('viewExercises', { exercises: results, searchTerm: term });
+  });
 });
 
 // update food -Elden ----------------------------------------//
