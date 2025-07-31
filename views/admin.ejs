@@ -89,7 +89,7 @@
       if (Number.isFinite(a) && a >= 0) {
         agesArr[a < 18 ? 0 : a <= 24 ? 1 : a <= 34 ? 2 : a <= 44 ? 3 : a <= 54 ? 4 : a <= 64 ? 5 : 6]++;
       }
-      const g = String(u.gender || '').trim().toLowerCase();
+      const g = String(u.gender).trim().toLowerCase();
       if (g[0] === 'm') gMap.Male++;
       else if (g[0] === 'f') gMap.Female++;
       else gMap.Other++;
