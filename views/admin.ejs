@@ -67,45 +67,45 @@
     <hr class="my-5">
 <h3>User Demographics</h3>
 <div class="row">
-  <div class="col-md-8 mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title mb-3">Age distribution</h5>
-        <canvas id="ageChart" height="160"></canvas>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4 mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title mb-3">Gender</h5>
-        <canvas id="genderChart" height="160"></canvas>
-      </div>
-    </div>
-  </div>
+  <div class="col-md-8 mb-4 card"><div class="card-body">
+    <h5 class="card-title mb-3">Age distribution</h5>
+    <canvas id="ageChart" height="160"></canvas>
+  </div></div>
+
+  <div class="col-md-4 mb-4 card"><div class="card-body">
+    <h5 class="card-title mb-3">Gender</h5>
+    <canvas id="genderChart" height="160"></canvas>
+  </div></div>
 </div>
+
 <script>
-(function () {
-  const users = <%- JSON.stringify(users || []) %>;
+(() => {
+  <% 
+    // Aggregate on the server side to avoid serializing user objects to the client
+    const agesArr = [0,0,0,0,0,0,0]; // <18, 18–24, 25–34, 35–44, 45–54, 55–64, 65+
+    const gMap = { Male:0, Female:0, Other:0};
+
+    (users || []).forEach(u => {
+      const a = Number(u.age);
+      if (Number.isFinite(a) && a >= 0) {
+        agesArr[a < 18 ? 0 : a <= 24 ? 1 : a <= 34 ? 2 : a <= 44 ? 3 : a <= 54 ? 4 : a <= 64 ? 5 : 6]++;
+      }
+      const g = String(u.gender || '').trim().toLowerCase();
+      if (g[0] === 'm') gMap.Male++;
+      else if (g[0] === 'f') gMap.Female++;
+      else gMap.Other++;
+    });
+  %>
 
   const ageLabels = ['<18','18–24','25–34','35–44','45–54','55–64','65+'];
-  const ageCounts = Array(7).fill(0);
-  const genderCounts = { Male:0, Female:0, Other:0, Unspecified:0 };
+  const ageCounts = [<%= agesArr.join(',') %>];
 
-  for (const { age, gender } of users) {
-    const a = Number(age);
-    if (Number.isFinite(a) && a >= 0) {
-      ageCounts[a < 18 ? 0 : a <= 24 ? 1 : a <= 34 ? 2 : a <= 44 ? 3 : a <= 54 ? 4 : a <= 64 ? 5 : 6]++;
-    }
-    const g = String(gender || '').trim().toLowerCase();
-    if (!g) genderCounts.Unspecified++;
-    else if (g[0] === 'm') genderCounts.Male++;
-    else if (g[0] === 'f') genderCounts.Female++;
-    else genderCounts.Other++;
-  }
+  const genderLabelsAll = ['Male','Female','Other'];
+  const genderCountsAll = [<%= [gMap.Male, gMap.Female, gMap.Other].join(',') %>];
 
-  const gLabels = Object.keys(genderCounts).filter(k => genderCounts[k] > 0);
-  const gData = gLabels.map(k => genderCounts[k]);
+  // Drop zero gender count on the client
+  const gLabels = genderLabelsAll.filter((_, i) => genderCountsAll[i] > 0);
+  const gData   = genderCountsAll.filter(v => v > 0);
 
   new Chart(document.getElementById('ageChart'), {
     type: 'bar',
@@ -119,5 +119,6 @@
   });
 })();
 </script>
+
 </body>
 </html>
