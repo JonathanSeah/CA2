@@ -104,7 +104,7 @@
 
   // Drop zero gender count on the client
   const gLabels = genderLabelsAll.filter((label, i) => genderCountsAll[i] > 0);
-  const gData   = genderCountsAll.filter(v => v > 0);
+  const gData = genderCountsAll.filter(v => v > 0);
 
   new Chart(document.getElementById('ageChart'), {
     type: 'bar',
