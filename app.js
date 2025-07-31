@@ -474,7 +474,7 @@ app.post('/updateExercise/:id', checkAuthenticated, (req, res) => {
 //View All Items -Bao Rui
 
 // View All Foods
-app.get('/view-foods', (req, res) => {
+app.get('/viewFoods', (req, res) => {
   const userID = req.session.user.userID; // Get the logged-in user's ID
   // Search function - Alaric
   const term = req.query.search ? req.query.search.toLowerCase() : '';
@@ -501,7 +501,7 @@ app.get('/view-foods', (req, res) => {
 
 
 // View All Exercises
-app.get('/view-exercises', (req, res) => {
+app.get('/viewExercises', (req, res) => {
   const userID = req.session.user.userID; // Get the logged-in user's ID
   // Search function - Alaric
   const term = req.query.search ? req.query.search.toLowerCase() : '';
@@ -669,6 +669,3 @@ app.post('/deleteFood/:id', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);})
-
-
-// This is a comment :D
