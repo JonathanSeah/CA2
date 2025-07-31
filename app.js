@@ -645,7 +645,7 @@ app.post('/deleteExercise/:id', (req, res) => {
             console.error('Error deleting exercise:', error);
             res.status(500).send('Error deleting exercise');
         } else {
-            res.redirect('/view-exercises');
+            res.redirect('/viewExercises');
         }
     });
 });
@@ -660,7 +660,7 @@ app.post('/deleteFood/:id', (req, res) => {
             console.error('Error deleting food:', error);
             res.status(500).send('Error deleting food');
         } else {
-            res.redirect('/view-foods');
+            res.redirect('/viewFoods');
         }
     });
 });
