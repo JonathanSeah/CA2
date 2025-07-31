@@ -121,7 +121,7 @@ app.get('/register', (req, res) => {
 });
 
 //******** TODO: Insert code for login routes to render login page below ********//
-app.get('/login', (req, res) => {
+app.get('/login', (req, res) => {  // get login page
     res.render('login', { 
         messages: req.flash('success'), // Retrieve success messages from session and pass them to the view
         errors: req.flash('error') // Retrieve error messages from session and pass them to the view
