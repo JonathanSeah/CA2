@@ -22,6 +22,7 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Admin Dashboard</h1>
+        <a href="/logout" class="btn btn-danger">Logout</a>
         <form method="GET" class="mb-3">
             <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
             <button type="submit" class="btn btn-secondary">Search User...</button>
@@ -118,8 +119,5 @@
   });
 })();
 </script>
-<footer class="text-center my-5">
-  <a href="/logout" class="btn btn-outline-danger">Logout</a>
-</footer>
 </body>
 </html>
