@@ -32,10 +32,9 @@ const upload = multer({ storage: storage });
 //Created mysql connection
 const connection = mysql.createConnection({
     host: 'localhost',
-    port: 3306,
     user: 'root',
-    password: 'password',
-    database: 'c237_24009380'
+    password: 'Republic_C207',
+    database: 'c237_24009380',
   });
 const pool = connection.promise(); 
 // Connect to the MySQL database
