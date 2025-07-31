@@ -574,7 +574,7 @@ app.post('/updateFood/:id', checkAuthenticated,upload.single('image'), (req, res
     }
 
     const updateSql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ?, image = ? WHERE foodID = ?';
-    connection.query(updateSql, [food_name, carbs, protein, calories, fats, foodID, image], (updateErr) => {
+    connection.query(updateSql, [food_name, carbs, protein, calories, fats, image , foodID], (updateErr) => {
       if (updateErr) {
         console.error("Error updating food:", updateErr);
         return res.status(500).send('Error updating food');
