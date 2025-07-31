@@ -4,9 +4,13 @@
     <title>Dashboard</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body, html{
+        html, body {
             height: 100%;
+            display: flex;
+            flex-direction: column;     
+            align-items: center;             
             background-image: linear-gradient(orange, pink);
+            background-size: cover;
         }
     </style>
 </head>
@@ -14,9 +18,8 @@
     <div class="container py-5">
         <h1 class="mb-3">Dashboard</h1>
         <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
-
         <div class="mb-3">
-            <a href="/profile" class="btn btn-outline-primary me-2">View Profile</a>
+            <a href="/profile" class="btn btn-outline me-2">View Profile</a>
             <a href="/logout" class="btn btn-danger">Logout</a>
         </div>
 
