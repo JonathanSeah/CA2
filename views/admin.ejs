@@ -6,10 +6,23 @@
     <title>Admin Dashboard</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body, html{
+            height: 200%;
+            background-image: linear-gradient(orange, pink);
+        }
+        table {
+          border: 1px solid black;
+        }
+        td {
+          background-color: lightgray;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1 class="mt-5">Admin Dashboard</h1>
+        <a href="/logout" class="btn btn-danger">Logout</a>
         <form method="GET" class="mb-3">
             <input type="text" name="search" placeholder="Search..." value="<%= searchTerm %>" class="form-control w-25 d-inline-block me-2">
             <button type="submit" class="btn btn-secondary">Search User...</button>
@@ -41,9 +54,9 @@
                         <td><%= u.gender %></td>
                         <td><%= u.role %></td>
                         <td class="text-nowrap">
-                            <a href="/updateUser/<%= u.userID %>" class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation()">Update</a>
+                            <a href="/updateUser/<%= u.userID %>" class="btn btn-sm btn-primary me-1" onclick="event.stopPropagation()">Update</a>
                             <form action="/deleteUser/<%= u.userID %>" method="POST" class="d-inline" onclick="event.stopPropagation()">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -106,8 +119,5 @@
   });
 })();
 </script>
-<footer class="text-center my-5">
-  <a href="/logout" class="btn btn-outline-danger">Logout</a>
-</footer>
 </body>
 </html>
