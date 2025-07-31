@@ -546,9 +546,13 @@ app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
   });
 });
 
-app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
+app.post('/updateFood/:id', checkAuthenticated,upload.single('image'), (req, res) => {
   const foodID = req.params.id;
-  const { food_name, carbs, protein, calories, fats, image } = req.body;
+  const { food_name, carbs, protein, calories, fats,  } = req.body;
+  let image = req.body.currentImage; // Default to current image if not updated
+  if (req.file) {
+    image = req.file.filename;
+  }
   
   // First, fetch the food entry to check ownership or admin
   const fetchSql = 'SELECT userID FROM food_tracker WHERE foodID = ?';
