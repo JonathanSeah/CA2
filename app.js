@@ -34,8 +34,12 @@ const upload = multer({ storage: storage });
 const connection = mysql.createConnection({
     host: 'c237web.mysql.database.azure.com',
     user: 'c237student',
+    port: 3306, 
     password: 'c237student!',
     database: 'c237_24009380',
+    ssl: {
+        rejectUnauthorized: true // Disable SSL certificate validation
+    }
   });
 const pool = connection.promise(); 
 // Connect to the MySQL database
