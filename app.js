@@ -29,11 +29,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
+
 //Created mysql connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Republic_C207',
+    host: 'c237web.mysql.database.azure.com',
+    user: 'c237student',
+    password: 'c237student!',
     database: 'c237_24009380',
   });
 const pool = connection.promise(); 
