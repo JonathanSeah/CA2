@@ -54,9 +54,9 @@
                         <td><%= u.gender %></td>
                         <td><%= u.role %></td>
                         <td class="text-nowrap">
-                            <a href="/updateUser/<%= u.userID %>" class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation()">Update</a>
+                            <a href="/updateUser/<%= u.userID %>" class="btn btn-sm btn-primary me-1" onclick="event.stopPropagation()">Update</a>
                             <form action="/deleteUser/<%= u.userID %>" method="POST" class="d-inline" onclick="event.stopPropagation()">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
                         </td>
                     </tr>
