@@ -32,10 +32,9 @@ const upload = multer({ storage: storage });
 //Created mysql connection
 const connection = mysql.createConnection({
     host: 'localhost',
-    port: 3306,
     user: 'root',
-    password: 'password',
-    database: 'c237_24009380'
+    password: 'Republic_C207',
+    database: 'c237_24009380',
   });
 const pool = connection.promise(); 
 // Connect to the MySQL database
@@ -546,9 +545,13 @@ app.get('/updateFood/:id', checkAuthenticated, (req, res) => {
   });
 });
 
-app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
+app.post('/updateFood/:id', checkAuthenticated,upload.single('image'), (req, res) => {
   const foodID = req.params.id;
-  const { food_name, carbs, protein, calories, fats, image } = req.body;
+  const { food_name, carbs, protein, calories, fats,  } = req.body;
+  let image = req.body.currentImage; // Default to current image if not updated
+  if (req.file) {
+    image = req.file.filename;
+  }
   
   // First, fetch the food entry to check ownership or admin
   const fetchSql = 'SELECT userID FROM food_tracker WHERE foodID = ?';
@@ -570,7 +573,7 @@ app.post('/updateFood/:id', checkAuthenticated, (req, res) => {
     }
 
     const updateSql = 'UPDATE food_tracker SET food_name = ?, carbs = ?, protein = ?, calories = ?, fats = ?, image = ? WHERE foodID = ?';
-    connection.query(updateSql, [food_name, carbs, protein, calories, fats, foodID, image], (updateErr) => {
+    connection.query(updateSql, [food_name, carbs, protein, calories, fats, image , foodID], (updateErr) => {
       if (updateErr) {
         console.error("Error updating food:", updateErr);
         return res.status(500).send('Error updating food');
