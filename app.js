@@ -585,7 +585,7 @@ app.post('/updateFood/:id', checkAuthenticated,upload.single('image'), (req, res
 //---------------------------------------------------------------//
 
 // update User - Jonathan ---------------------------------------//
-app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
+app.get('/updateUser/:id', checkAuthenticated, (req, res) => {
   const userID = req.params.id;
   const sql = 'SELECT * FROM user WHERE userID = ?';
   connection.query(sql, [userID], (err, results) => {
@@ -602,7 +602,7 @@ app.get('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
   });
 });
 
-app.post('/updateUser/:id', checkAuthenticated, checkAdmin, (req, res) => {
+app.post('/updateUser/:id', checkAuthenticated, (req, res) => {
   const id = req.params.id;
   const { username, email_address, phone_number, age, gender, role } = req.body;
   const sql = `
